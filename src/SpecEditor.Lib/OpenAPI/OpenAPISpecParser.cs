@@ -63,4 +63,13 @@ public class OpenAPISpecParser
 
         return _document;
     }
+
+    public OpenApiStatsResult GetStats() 
+    {
+        var visitor = new OpenApiStatsVisitor();
+        var walker = new OpenApiWalker(visitor);
+        walker.Walk(_document);
+
+        return visitor.GetStats();
+    }
 }

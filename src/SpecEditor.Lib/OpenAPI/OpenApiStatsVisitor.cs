@@ -5,6 +5,15 @@ namespace SpecEditor.Lib.OpenAPI;
 
 public class OpenApiStatsVisitor : OpenApiVisitorBase
 {
+
+    public OpenApiStatsResult GetStats()
+    {
+        return new OpenApiStatsResult(
+            this.PathItemsCount, this.OperationsCount, this.ParametersCount,
+            this.RequestBodyCount, this.ResponsesCount, this.LinksCount,
+            this.CallbacksCount, this.SchemasCount);
+    }
+
     public int SchemasCount { get; private set; }
 
     public override void Visit(OpenApiSchema schema)
