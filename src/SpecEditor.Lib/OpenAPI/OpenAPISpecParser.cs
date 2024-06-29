@@ -44,7 +44,8 @@ public class OpenAPISpecParser
         _inlineExternal = inlineExternal;
     }
 
-
+    public OpenApiDocument Document => _document ?? throw new NullReferenceException(nameof(Document));
+    
     public OpenApiSpecInfo Load()
     {
         var stop_watch = new Stopwatch();
