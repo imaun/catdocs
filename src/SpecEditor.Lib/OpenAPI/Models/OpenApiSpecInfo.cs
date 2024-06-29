@@ -7,5 +7,6 @@ public record OpenApiSpecInfo(
     string Format,
     bool IsJson,
     bool IsYaml,
-    List<string> Errors
+    List<string> Errors,
+    int ParseTime
     );

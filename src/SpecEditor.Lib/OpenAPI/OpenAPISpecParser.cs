@@ -45,7 +45,7 @@ public class OpenAPISpecParser
     }
 
 
-    public OpenApiDocument Load()
+    public OpenApiSpecInfo Load()
     {
         var stop_watch = new Stopwatch();
         stop_watch.Start();
@@ -67,7 +67,10 @@ public class OpenAPISpecParser
             }
         }
 
-        return _document;
+        return new OpenApiSpecInfo(
+            _inputFile,
+            _hasError,
+            )
     }
 
     public OpenApiStatsResult GetStats() 
