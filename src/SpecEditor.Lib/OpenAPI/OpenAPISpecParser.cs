@@ -48,6 +48,12 @@ public class OpenAPISpecParser
     
     public OpenApiSpecInfo Load()
     {
+        if (!File.Exists(_inputFile))
+        {
+            //TODO: Log file not found
+            throw new FileNotFoundException(nameof(_inputFile));
+        }
+        
         var stop_watch = new Stopwatch();
         stop_watch.Start();
 
@@ -90,7 +96,12 @@ public class OpenAPISpecParser
     }
 
 
-    public string SerializeDocument()
+    public string ToJsonString() => Convert(OpenApiFormat.Json);
+
+    public string ToYamlString() => Convert(OpenApiFormat.Yaml);
+    
+
+    private string Convert(OpenApiFormat format)
     {
         if(_document is null)
         {
@@ -102,7 +113,7 @@ public class OpenAPISpecParser
         _document.Serialize(
             stream,
             _version,
-            _format,
+            format,
             new()
             {
                 InlineLocalReferences = _inlineLocal,
