@@ -1,14 +1,9 @@
 ﻿using Microsoft.OpenApi;
-using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Extensions;
 using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Readers;
 using Microsoft.OpenApi.Services;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SpecEditor.Lib.OpenAPI;
 
@@ -21,6 +16,9 @@ public class OpenAPISpecParser
     private List<string> _errors = [];
     private OpenApiSpecVersion _version;
     private OpenApiDocument _document;
+    private OpenApiFormat _format;
+    private bool _inlineLocal;
+    private bool _inlineExternal;
 
     private void AddError(string error)
     {
@@ -71,5 +69,30 @@ public class OpenAPISpecParser
         walker.Walk(_document);
 
         return visitor.GetStats();
+    }
+
+
+    public string SerializeDocument()
+    {
+        if(_document is null)
+        {
+            throw new NullReferenceException(nameof(_document));
+        }
+
+        var stream = new MemoryStream();
+
+        _document.Serialize(
+            stream,
+            _version,
+            _format,
+            new()
+            {
+                InlineLocalReferences = _inlineLocal,
+                InlineExternalReferences = _inlineExternal
+            });
+
+        stream.Position = 0;
+
+        return new StreamReader(stream).ReadToEnd();
     }
 }
