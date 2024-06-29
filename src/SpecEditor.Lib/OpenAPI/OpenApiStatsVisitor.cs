@@ -5,11 +5,11 @@ namespace SpecEditor.Lib.OpenAPI;
 
 public class OpenApiStatsVisitor : OpenApiVisitorBase
 {
-    public int SchemaCount { get; private set; }
+    public int SchemasCount { get; private set; }
 
     public override void Visit(OpenApiSchema schema)
     {
-        SchemaCount++;
+        SchemasCount++;
     }
 
 
@@ -28,40 +28,47 @@ public class OpenApiStatsVisitor : OpenApiVisitorBase
         HeaderCount++;
     }
 
-    public int PathItemCount { get; private set; }
+    public int PathItemsCount { get; private set; }
 
     public override void Visit(OpenApiPathItem pathItem)
     {
-        PathItemCount++;
+        PathItemsCount++;
     }
 
     
-    public int ResponseCount { get; private set; }
+    public int ResponsesCount { get; private set; }
 
     public override void Visit(OpenApiResponses response)
     {
-        ResponseCount++;
+        ResponsesCount++;
     }
 
 
-    public int OperationCount { get; private set; }
+    public int OperationsCount { get; private set; }
 
     public override void Visit(OpenApiOperation operation)
     {
-        OperationCount++;
+        OperationsCount++;
     }
 
-    public int LinkCount { get; private set; }
+    public int LinksCount { get; private set; }
 
     public override void Visit(OpenApiLink operation)
     {
-        LinkCount++;
+        LinksCount++;
     }
 
-    public int CallbackCount { get; set; }
+    public int CallbacksCount { get; set; }
 
     public override void Visit(OpenApiCallback callback)
     {
-        CallbackCount++;
+        CallbacksCount++;
+    }
+
+    public int RequestBodyCount { get; set; }
+
+    public override void Visit(OpenApiRequestBody requestBody)
+    {
+        RequestBodyCount++;
     }
 }
