@@ -27,13 +27,21 @@ public class OpenAPISpecParser
         _errors.Add(error);
     }
 
-    public OpenAPISpecParser(string inputFile, OpenApiSpecVersion version = OpenApiSpecVersion.OpenApi3_0)
+    public OpenAPISpecParser(
+        string inputFile, 
+        OpenApiSpecVersion version = OpenApiSpecVersion.OpenApi3_0,
+        OpenApiFormat format = OpenApiFormat.Yaml,
+        bool inlineLocal = false,
+        bool inlineExternal = false)
     {
         if (string.IsNullOrWhiteSpace(inputFile))
             throw new ArgumentNullException(nameof(inputFile));
 
         _inputFile = inputFile;
         _version = version;
+        _format = format;
+        _inlineLocal = inlineLocal;
+        _inlineExternal = inlineExternal;
     }
 
 
