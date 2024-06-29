@@ -7,6 +7,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{1A79F16E-457
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpecEditor.Lib", "src\SpecEditor.Lib\SpecEditor.Lib.csproj", "{F8521AAD-412E-4191-98FF-D966A2D682C3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spece", "src\Spece\Spece.csproj", "{CD177B38-6B14-47E6-BA26-B85237D6C36B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,11 +19,16 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F8521AAD-412E-4191-98FF-D966A2D682C3} = {1A79F16E-4574-4E51-96AE-4B53296499F6}
+		{CD177B38-6B14-47E6-BA26-B85237D6C36B} = {1A79F16E-4574-4E51-96AE-4B53296499F6}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{F8521AAD-412E-4191-98FF-D966A2D682C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F8521AAD-412E-4191-98FF-D966A2D682C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F8521AAD-412E-4191-98FF-D966A2D682C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F8521AAD-412E-4191-98FF-D966A2D682C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD177B38-6B14-47E6-BA26-B85237D6C36B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD177B38-6B14-47E6-BA26-B85237D6C36B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD177B38-6B14-47E6-BA26-B85237D6C36B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD177B38-6B14-47E6-BA26-B85237D6C36B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

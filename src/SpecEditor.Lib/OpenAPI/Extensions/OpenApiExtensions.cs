@@ -15,6 +15,21 @@ internal static class OpenApiExtensions
 
         return "Unknown";
     }
-    
-    
+
+    public static bool IsJson(this OpenApiFormat format)
+        => format is OpenApiFormat.Json;
+
+    public static bool IsYaml(this OpenApiFormat format)
+        => format is OpenApiFormat.Yaml;
+
+    public static string ToStr(this OpenApiFormat format)
+    {
+        if (format is OpenApiFormat.Json)
+            return "JSON";
+
+        if (format is OpenApiFormat.Yaml)
+            return "YAML";
+
+        return "Unknown";
+    }
 }

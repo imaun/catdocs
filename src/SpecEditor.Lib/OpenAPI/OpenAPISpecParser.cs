@@ -12,7 +12,7 @@ public class OpenAPISpecParser
     private readonly string _inputFile;
     private long _parseTime;
     private bool _success;
-    private bool _hasError;
+    private bool _hasErrors;
     private List<string> _errors = [];
     private OpenApiSpecVersion _version;
     private OpenApiDocument _document;
@@ -56,10 +56,10 @@ public class OpenAPISpecParser
         _parseTime = stop_watch.ElapsedMilliseconds;
         //TODO: log parseTime
 
-        _hasError = diagnostics.Errors.Any();
-        _success = !_hasError;
+        _hasErrors = diagnostics.Errors.Any();
+        _success = !_hasErrors;
 
-        if(_hasError)
+        if(_hasErrors)
         {
             foreach(var error in diagnostics.Errors)
             {
@@ -69,8 +69,14 @@ public class OpenAPISpecParser
 
         return new OpenApiSpecInfo(
             _inputFile,
-            _hasError,
-            )
+            _hasErrors,
+            _version.ToStr(),
+            _format.ToStr(),
+            _format.IsJson(),
+            _format.IsYaml(),
+            _errors,
+            _parseTime
+        );
     }
 
     public OpenApiStatsResult GetStats() 
