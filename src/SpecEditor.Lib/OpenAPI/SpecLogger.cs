@@ -4,6 +4,12 @@ public static class SpecLogger
 {
     
     public static string Filename { get; private set; }
+    
+    public static bool WriteToConsole { get; private set; }
+
+    public static void EnableConsoleLogging() => WriteToConsole = true;
+
+    public static void DisableConsoleLogging() => WriteToConsole = false;
 
     public static void SetLogFilename(string filePath)
     {
@@ -20,6 +26,12 @@ public static class SpecLogger
         }
 
         var log_item = $"{DateTime.Now.ToLongDateString()}: {log}";
+        
+        if (WriteToConsole)
+        {
+            Console.WriteLine(log_item);
+        }
+        
         var fs = new FileStream(
             Filename, FileMode.Append, FileAccess.Write, FileShare.Read);
         using var stream_writer = new StreamWriter(fs);
