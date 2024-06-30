@@ -221,13 +221,13 @@ public static class ExportExtensions
             return;
         }
 
-        var security_schemas_dir = Path.Combine(outputDir, "securityschemas");
-        CreateDirIfNotExists(security_schemas_dir);
+        var security_schemes_dir = Path.Combine(outputDir, "securityschemes");
+        CreateDirIfNotExists(security_schemes_dir);
         
-        foreach (var securitySchema in document.Components.SecuritySchemes)
+        foreach (var securityScheme in document.Components.SecuritySchemes)
         {
-            var filename = Path.Combine(security_schemas_dir, $"{securitySchema.Key}.{format.GetFormatFileExtension()}");
-            var content = SerializeElement(securitySchema.Value, version, format);
+            var filename = Path.Combine(security_schemes_dir, $"{securityScheme.Key}.{format.GetFormatFileExtension()}");
+            var content = SerializeElement(securityScheme.Value, version, format);
             
             SaveToFile(filename, content);
         }

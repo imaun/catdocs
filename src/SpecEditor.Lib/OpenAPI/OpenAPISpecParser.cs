@@ -4,10 +4,6 @@ using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Readers;
 using Microsoft.OpenApi.Services;
 using System.Diagnostics;
-using System.Text;
-using System.IO;
-using System.Runtime.CompilerServices;
-using Microsoft.OpenApi.Writers;
 
 namespace SpecEditor.Lib.OpenAPI;
 

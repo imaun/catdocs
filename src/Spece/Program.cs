@@ -39,8 +39,6 @@ parser.SplitToExternalFiles(outputDir);
 
 Console.WriteLine($"Split finished in {parser.SplitTime} ms");
 
-Environment.Exit(0);
-
 var json = parser.ToJsonString();
 
 var dest_file = "C:\\Users\\imun2\\Source\\openapi\\output.json";
@@ -60,6 +58,5 @@ await yaml_file_stream.FlushAsync();
 yaml_file_stream.Close();
 
 Console.WriteLine("Finished!");
-
 
 Environment.Exit(0);
