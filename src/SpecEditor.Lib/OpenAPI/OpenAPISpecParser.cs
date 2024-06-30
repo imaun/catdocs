@@ -144,25 +144,7 @@ public class OpenAPISpecParser
         
         CreateDirIfNotExists(outputDir);
         
-        var paths_dir = Path.Combine(outputDir, $"paths");
-        CreateDirIfNotExists(paths_dir);
-
-        foreach (var path in _document.Paths)
-        {
-            var path_filename = GetNormalizedPathFilename($"{paths_dir}{Path.DirectorySeparatorChar}{path.Key}.{_format.GetFormatFileExtension()}");
-            using var stream = new MemoryStream();
-            path.Value.Serialize(stream, _version, _format,
-                new OpenApiWriterSettings
-                {
-                    InlineLocalReferences = _inlineLocal,
-                    InlineExternalReferences = _inlineExternal
-                });
-            stream.Position = 0;
-            var content = new StreamReader(stream).ReadToEnd();
-            
-            SaveToFile(path_filename, content);
-        }
-        
+        _document.ExportPaths(outputDir, _version, _format);
         //TODO: check if has components
         
         _document.ExportSchemas(outputDir, _version, _format);
@@ -174,6 +156,7 @@ public class OpenAPISpecParser
         _document.ExportCallbacks(outputDir, _version, _format);
         _document.ExportRequestBodies(outputDir, _version, _format);
         _document.ExportSecuritySchemes(outputDir, _version, _format);
+        
         
         stop_watch.Stop();
         _splitTime = stop_watch.ElapsedMilliseconds;
@@ -211,10 +194,5 @@ public class OpenAPISpecParser
         {
             Directory.CreateDirectory(path);
         }
-    }
-
-    private void ExportSchemas(string outputDir)
-    {
-        
     }
 }

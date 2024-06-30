@@ -9,6 +9,30 @@ namespace SpecEditor.Lib.OpenAPI;
 public static class ExportExtensions
 {
 
+    public static void ExportPaths(
+        this OpenApiDocument document, string outputDir, OpenApiSpecVersion version, OpenApiFormat format)
+    {
+        ArgumentNullException.ThrowIfNull(document);
+
+        if (!document.Paths.Any())
+        {
+            return;
+        }
+
+        var paths_dir = Path.Combine(outputDir, "paths");
+        CreateDirIfNotExists(paths_dir);
+
+        foreach (var path in document.Paths)
+        {
+            var filename = Path.Combine(
+                paths_dir, 
+                $"{GetNormalizedPathFilename(path.Key)}.{format.GetFormatFileExtension()}");
+            
+            var content = SerializeElement(path.Value, version, format);
+            SaveToFile(filename, content);
+        }
+    }
+    
     public static void ExportSchemas(
         this OpenApiDocument document, string outputDir, OpenApiSpecVersion version, OpenApiFormat format)
     {
@@ -217,6 +241,17 @@ public static class ExportExtensions
         stream_writer.Write(content);
         stream_writer.Flush();
         stream_writer.Close();
+    }
+    
+    private static string GetNormalizedPathFilename(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            //TODO: log error
+            throw new ArgumentNullException(nameof(path));
+        }
+
+        return path.TrimStart('/').Replace('/', '_');
     }
     
     private static void CreateDirIfNotExists(string path)
