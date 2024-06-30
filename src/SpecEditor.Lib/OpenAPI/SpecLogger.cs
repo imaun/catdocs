@@ -9,7 +9,7 @@ public static class SpecLogger
     {
         var fileName = Path.GetFileNameWithoutExtension(filePath);
         var now = DateTime.Now;
-        Filename = $"{fileName}-{now.Date.ToShortDateString()}-{now.ToShortTimeString()}";
+        Filename = $"{fileName}-{now.Date.ToShortDateString()}-{now.ToShortTimeString()}.log";
     }
 
     public static void Log(string log)
