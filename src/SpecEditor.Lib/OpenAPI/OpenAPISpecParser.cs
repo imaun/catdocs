@@ -140,14 +140,16 @@ public class OpenAPISpecParser
         }
 
         var stop_watch = new Stopwatch();
-        var paths_dir = Path.Combine(outputDir, $".{Path.PathSeparator}paths");
-
+        
+        CreateDirIfNotExists(outputDir);
+        
+        var paths_dir = Path.Combine(outputDir, $"paths");
         CreateDirIfNotExists(paths_dir);
 
         foreach (var path in _document.Paths)
         {
-            var path_filename = $"{path.Key}.{_format.GetFormatFileExtension()}";
-            var stream = new MemoryStream();
+            var path_filename = GetNormalizedPathFilename($"{paths_dir}{Path.DirectorySeparatorChar}{path.Key}.{_format.GetFormatFileExtension()}");
+            using var stream = new MemoryStream();
             path.Value.Serialize(stream, _version, _format,
                 new OpenApiWriterSettings
                 {
@@ -170,13 +172,12 @@ public class OpenAPISpecParser
 
     private static void SaveToFile(string filePath, string content)
     {
-        using var file_stream = new StreamWriter(
-            filePath, Encoding.UTF8, 
-            new FileStreamOptions { Mode = FileMode.Create });
-        
-        file_stream.Write(content);
-        file_stream.Flush();
-        file_stream.Close();
+        var fs = new FileStream(
+            filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        using var stream_writer = new StreamWriter(fs);
+        stream_writer.Write(content);
+        stream_writer.Flush();
+        stream_writer.Close();
     }
 
     private static string GetNormalizedPathFilename(string path)

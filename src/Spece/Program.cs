@@ -31,6 +31,16 @@ Console.WriteLine($" {json_document.Info.Description}");
 var stats = parser.GetStats();
 Console.WriteLine(stats.ToString());
 
+//var outputDir = Path.Combine(Environment.CurrentDirectory, "__out");
+var outputDir = "C:\\Users\\imun2\\Source\\openapi\\__out";
+Console.WriteLine($"Start splitting to {outputDir}");
+
+parser.SplitToExternalFiles(outputDir);
+
+Console.WriteLine($"Split finished in {parser.SplitTime} ms");
+
+Environment.Exit(0);
+
 var json = parser.ToJsonString();
 
 var dest_file = "C:\\Users\\imun2\\Source\\openapi\\output.json";
