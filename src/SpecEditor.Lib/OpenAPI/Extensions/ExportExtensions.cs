@@ -120,6 +120,28 @@ public static class ExportExtensions
             SaveToFile(filename, content);
         }
     }
+
+    public static void ExportLinks(
+        this OpenApiDocument document, string outputDir, OpenApiSpecVersion version, OpenApiFormat format)
+    {
+        ArgumentNullException.ThrowIfNull(document);
+
+        if (!document.Components.Links.Any())
+        {
+            return;
+        }
+
+        var links_dir = Path.Combine(outputDir, "links");
+        CreateDirIfNotExists(links_dir);
+
+        foreach (var link in document.Components.Links)
+        {
+            var filename = Path.Combine(links_dir, $"{link.Key}.{format.GetFormatFileExtension()}");
+            var content = SerializeElement(link.Value, version, format);
+            
+            SaveToFile(filename, content);
+        }
+    }
     
     private static void SaveToFile(string filePath, string content)
     {
