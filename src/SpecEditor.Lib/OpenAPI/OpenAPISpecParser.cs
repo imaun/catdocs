@@ -171,6 +171,7 @@ public class OpenAPISpecParser
         _document.ExportHeaders(outputDir, _version, _format);
         _document.ExportResponses(outputDir, _version, _format);
         _document.ExportLinks(outputDir, _version, _format);
+        _document.ExportCallbacks(outputDir, _version, _format);
         
         stop_watch.Stop();
         _splitTime = stop_watch.ElapsedMilliseconds;

@@ -142,6 +142,28 @@ public static class ExportExtensions
             SaveToFile(filename, content);
         }
     }
+
+    public static void ExportCallbacks(
+        this OpenApiDocument document, string outputDir, OpenApiSpecVersion version, OpenApiFormat format)
+    {
+        ArgumentNullException.ThrowIfNull(document);
+
+        if (!document.Components.Callbacks.Any())
+        {
+            return;
+        }
+
+        var callbacks_dir = Path.Combine(outputDir, "callbacks");
+        CreateDirIfNotExists(callbacks_dir);
+
+        foreach (var callback in document.Components.Callbacks)
+        {
+            var filename = Path.Combine(callbacks_dir, $"{callback.Key}.{format.GetFormatFileExtension()}");
+            var content = SerializeElement(callback.Value, version, format);
+            
+            SaveToFile(filename, content);
+        }
+    }
     
     private static void SaveToFile(string filePath, string content)
     {
