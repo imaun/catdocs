@@ -32,4 +32,15 @@ internal static class OpenApiExtensions
 
         return "Unknown";
     }
+
+    public static string GetFormatFileExtension(this OpenApiFormat format)
+    {
+        if (format is OpenApiFormat.Json)
+            return "json";
+
+        if (format is OpenApiFormat.Yaml)
+            return "yaml";
+
+        return "txt";
+    }
 }

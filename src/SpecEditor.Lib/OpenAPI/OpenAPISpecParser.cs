@@ -4,6 +4,10 @@ using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Readers;
 using Microsoft.OpenApi.Services;
 using System.Diagnostics;
+using System.Text;
+using System.IO;
+using System.Runtime.CompilerServices;
+using Microsoft.OpenApi.Writers;
 
 namespace SpecEditor.Lib.OpenAPI;
 
@@ -19,6 +23,7 @@ public class OpenAPISpecParser
     private OpenApiFormat _format;
     private bool _inlineLocal;
     private bool _inlineExternal;
+    private long _splitTime;
 
     private void AddError(string error)
     {
@@ -45,6 +50,8 @@ public class OpenAPISpecParser
     }
 
     public OpenApiDocument Document => _document ?? throw new NullReferenceException(nameof(Document));
+    
+    public long SplitTime { get; private set; }
     
     public OpenApiSpecInfo Load()
     {
@@ -123,5 +130,81 @@ public class OpenAPISpecParser
         stream.Position = 0;
 
         return new StreamReader(stream).ReadToEnd();
+    }
+
+    public void SplitToExternalFiles(string outputDir)
+    {
+        if (string.IsNullOrWhiteSpace(outputDir))
+        {
+            throw new ArgumentNullException(nameof(outputDir));
+        }
+
+        var stop_watch = new Stopwatch();
+        var paths_dir = Path.Combine(outputDir, $".{Path.PathSeparator}paths");
+
+        CreateDirIfNotExists(paths_dir);
+
+        foreach (var path in _document.Paths)
+        {
+            var path_filename = $"{path.Key}.{_format.GetFormatFileExtension()}";
+            var stream = new MemoryStream();
+            path.Value.Serialize(stream, _version, _format,
+                new OpenApiWriterSettings
+                {
+                    InlineLocalReferences = _inlineLocal,
+                    InlineExternalReferences = _inlineExternal
+                });
+            stream.Position = 0;
+            var content = new StreamReader(stream).ReadToEnd();
+            
+            SaveToFile(path_filename, content);
+        }
+        
+        //TODO: check if has components
+        
+        _document.ExportSchemas(outputDir, _version, _format);
+        
+        stop_watch.Stop();
+        _splitTime = stop_watch.ElapsedMilliseconds;
+    }
+
+    private static void SaveToFile(string filePath, string content)
+    {
+        using var file_stream = new StreamWriter(
+            filePath, Encoding.UTF8, 
+            new FileStreamOptions { Mode = FileMode.Create });
+        
+        file_stream.Write(content);
+        file_stream.Flush();
+        file_stream.Close();
+    }
+
+    private static string GetNormalizedPathFilename(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            //TODO: log error
+            throw new ArgumentNullException(nameof(path));
+        }
+
+        return path.TrimStart('/').Replace('/', '_');
+    }
+
+    private static void CreateDirIfNotExists(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            throw new ArgumentNullException(nameof(path));
+        }
+
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+        }
+    }
+
+    private void ExportSchemas(string outputDir)
+    {
+        
     }
 }
