@@ -54,6 +54,28 @@ public static class ExportExtensions
         }
     }
     
+    public static void ExportExamples(
+        this OpenApiDocument document, string outputDir, OpenApiSpecVersion version, OpenApiFormat format)
+    {
+        ArgumentNullException.ThrowIfNull(document);
+
+        if (!document.Components.Examples.Any())
+        {
+            return;
+        }
+
+        var examples_dir = Path.Combine(outputDir, "examples");
+        CreateDirIfNotExists(examples_dir);
+
+        foreach (var example in document.Components.Examples)
+        {
+            var filename = Path.Combine(examples_dir, $"{example.Key}.{format.GetFormatFileExtension()}");
+            var content = SerializeElement(example.Value, version, format);
+            
+            SaveToFile(filename, content);
+        }
+    }
+    
     private static void SaveToFile(string filePath, string content)
     {
         var fs = new FileStream(
