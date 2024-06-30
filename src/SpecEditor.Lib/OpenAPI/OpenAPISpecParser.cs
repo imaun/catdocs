@@ -140,6 +140,7 @@ public class OpenAPISpecParser
         }
 
         var stop_watch = new Stopwatch();
+        stop_watch.Start();
         
         CreateDirIfNotExists(outputDir);
         

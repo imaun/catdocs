@@ -2,6 +2,7 @@
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Extensions;
 using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi.Writers;
 
 namespace SpecEditor.Lib.OpenAPI;
 
@@ -27,11 +28,16 @@ public static class ExportExtensions
         var schema_dir = Path.Combine(outputDir, $"schemas");
         CreateDirIfNotExists(schema_dir);
         
+        
         foreach (var schema in document.Components.Schemas)
         {
             string filename = Path.Combine(schema_dir, $"{schema.Key}.{format.GetFormatFileExtension()}");
             using var stream = new MemoryStream();
-            schema.Value.Serialize(stream, version, format);
+            schema.Value.Serialize(stream, version, format, new OpenApiWriterSettings
+            {
+                InlineLocalReferences = true,
+                InlineExternalReferences = true
+            });
             stream.Position = 0;
             
             var content = new StreamReader(stream).ReadToEnd();
