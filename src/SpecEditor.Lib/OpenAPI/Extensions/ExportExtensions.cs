@@ -1,6 +1,6 @@
-﻿using System.Text;
-using Microsoft.OpenApi;
+﻿using Microsoft.OpenApi;
 using Microsoft.OpenApi.Extensions;
+using Microsoft.OpenApi.Interfaces;
 using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Writers;
 
@@ -10,15 +10,9 @@ public static class ExportExtensions
 {
 
     public static void ExportSchemas(
-        this OpenApiDocument document, 
-        string outputDir, 
-        OpenApiSpecVersion version, 
-        OpenApiFormat format)
+        this OpenApiDocument document, string outputDir, OpenApiSpecVersion version, OpenApiFormat format)
     {
-        if (document is null)
-        {
-            throw new ArgumentNullException(nameof(document));
-        }
+        ArgumentNullException.ThrowIfNull(document);
 
         if (!document.Components.Schemas.Any())
         {
@@ -28,19 +22,33 @@ public static class ExportExtensions
         var schema_dir = Path.Combine(outputDir, $"schemas");
         CreateDirIfNotExists(schema_dir);
         
-        
         foreach (var schema in document.Components.Schemas)
         {
-            string filename = Path.Combine(schema_dir, $"{schema.Key}.{format.GetFormatFileExtension()}");
-            using var stream = new MemoryStream();
-            schema.Value.Serialize(stream, version, format, new OpenApiWriterSettings
-            {
-                InlineLocalReferences = true,
-                InlineExternalReferences = true
-            });
-            stream.Position = 0;
+            var filename = Path.Combine(schema_dir, $"{schema.Key}.{format.GetFormatFileExtension()}");
+            var content = SerializeElement(schema.Value, version, format);
             
-            var content = new StreamReader(stream).ReadToEnd();
+            SaveToFile(filename, content);
+        }
+    }
+
+
+    public static void ExportParameters(
+        this OpenApiDocument document, string outputDir, OpenApiSpecVersion version, OpenApiFormat format)
+    {
+        ArgumentNullException.ThrowIfNull(document);
+
+        if (!document.Components.Parameters.Any())
+        {
+            return;
+        }
+
+        var parameters_dir = Path.Combine(outputDir, "parameters");
+        CreateDirIfNotExists(parameters_dir);
+
+        foreach (var param in document.Components.Parameters)
+        {
+            var filename = Path.Combine(parameters_dir, $"{param.Key}.{format.GetFormatFileExtension()}");
+            var content = SerializeElement(param.Value, version, format);
             
             SaveToFile(filename, content);
         }
@@ -67,5 +75,19 @@ public static class ExportExtensions
         {
             Directory.CreateDirectory(path);
         }
+    }
+
+    private static string SerializeElement<T>(
+        T element, OpenApiSpecVersion version, OpenApiFormat format) where T: IOpenApiReferenceable
+    {
+        using var stream = new MemoryStream();
+        element.Serialize(stream, version, format, new OpenApiWriterSettings
+        {
+            InlineLocalReferences = true,
+            InlineExternalReferences = true
+        });
+        stream.Position = 0;
+        
+        return new StreamReader(stream).ReadToEnd();
     }
 }
