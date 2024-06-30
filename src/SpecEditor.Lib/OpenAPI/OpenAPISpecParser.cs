@@ -163,27 +163,6 @@ public class OpenAPISpecParser
         SpecLogger.Log($"Split completed in : {_splitTime} ms");
     }
 
-    private static void SaveToFile(string filePath, string content)
-    {
-        var fs = new FileStream(
-            filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
-        using var stream_writer = new StreamWriter(fs);
-        stream_writer.Write(content);
-        stream_writer.Flush();
-        stream_writer.Close();
-    }
-
-    private static string GetNormalizedPathFilename(string path)
-    {
-        if (string.IsNullOrWhiteSpace(path))
-        {
-            //TODO: log error
-            throw new ArgumentNullException(nameof(path));
-        }
-
-        return path.TrimStart('/').Replace('/', '_');
-    }
-
     private static void CreateDirIfNotExists(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
