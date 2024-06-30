@@ -37,12 +37,15 @@ public class OpenAPISpecParser
     {
         if (string.IsNullOrWhiteSpace(inputFile))
             throw new ArgumentNullException(nameof(inputFile));
-
+        
+        SpecLogger.SetLogFilename(inputFile);
         _inputFile = inputFile;
         _version = version;
         _format = format;
         _inlineLocal = inlineLocal;
         _inlineExternal = inlineExternal;
+        
+        
     }
 
     public OpenApiDocument Document => _document ?? throw new NullReferenceException(nameof(Document));
@@ -53,7 +56,7 @@ public class OpenAPISpecParser
     {
         if (!File.Exists(_inputFile))
         {
-            //TODO: Log file not found
+            SpecLogger.Log($"File '{_inputFile}' not found!");
             throw new FileNotFoundException(nameof(_inputFile));
         }
         
@@ -64,7 +67,7 @@ public class OpenAPISpecParser
         _document = new OpenApiStreamReader().Read(file_stream, out var diagnostics);
         stop_watch.Stop();
         _parseTime = stop_watch.ElapsedMilliseconds;
-        //TODO: log parseTime
+        SpecLogger.Log($"Document parsed in : {_parseTime} ms");
 
         _hasErrors = diagnostics.Errors.Any();
         _success = !_hasErrors;
@@ -75,6 +78,7 @@ public class OpenAPISpecParser
             {
                 AddError(error.ToString());
             }
+            SpecLogger.Log("Document has errors!");
         }
 
         return new OpenApiSpecInfo(
@@ -156,6 +160,7 @@ public class OpenAPISpecParser
         
         stop_watch.Stop();
         _splitTime = stop_watch.ElapsedMilliseconds;
+        SpecLogger.Log($"Split completed in : {_splitTime} ms");
     }
 
     private static void SaveToFile(string filePath, string content)

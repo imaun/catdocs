@@ -16,6 +16,7 @@ public static class ExportExtensions
 
         if (!document.Paths.Any())
         {
+            SpecLogger.Log("No API Paths found!");
             return;
         }
 
@@ -30,7 +31,9 @@ public static class ExportExtensions
             
             var content = SerializeElement(path.Value, version, format);
             SaveToFile(filename, content);
+            SpecLogger.Log($"Exported API Path: {path.Key} to {filename}");
         }
+        SpecLogger.Log("Export API Paths finished.");
     }
     
     public static void ExportSchemas(
@@ -40,6 +43,7 @@ public static class ExportExtensions
 
         if (!document.Components.Schemas.Any())
         {
+            SpecLogger.Log("No Schema found!");
             return;
         }
         
@@ -51,8 +55,10 @@ public static class ExportExtensions
             var filename = Path.Combine(schema_dir, $"{schema.Key}.{format.GetFormatFileExtension()}");
             var content = SerializeElement(schema.Value, version, format);
             
+            SpecLogger.Log($"Exported Schema: {schema.Key} to {filename}");
             SaveToFile(filename, content);
         }
+        SpecLogger.Log("Export Schemas finished.");
     }
 
 
@@ -63,6 +69,7 @@ public static class ExportExtensions
 
         if (!document.Components.Parameters.Any())
         {
+            SpecLogger.Log("No Parameters found!");
             return;
         }
 
@@ -75,7 +82,9 @@ public static class ExportExtensions
             var content = SerializeElement(param.Value, version, format);
             
             SaveToFile(filename, content);
+            SpecLogger.Log($"Exported Parameter: {param.Key} to {filename}");
         }
+        SpecLogger.Log("Export Parameters finished.");
     }
     
     public static void ExportExamples(
@@ -85,6 +94,7 @@ public static class ExportExtensions
 
         if (!document.Components.Examples.Any())
         {
+            SpecLogger.Log("No Examples found!");
             return;
         }
 
@@ -97,7 +107,9 @@ public static class ExportExtensions
             var content = SerializeElement(example.Value, version, format);
             
             SaveToFile(filename, content);
+            SpecLogger.Log($"Exported Example: {example.Key} to {filename}");
         }
+        SpecLogger.Log("Export Examples finished.");
     }
 
     public static void ExportHeaders(
@@ -130,6 +142,7 @@ public static class ExportExtensions
 
         if (!document.Components.Responses.Any())
         {
+            SpecLogger.Log("No Response found!");
             return;
         }
 
@@ -142,7 +155,9 @@ public static class ExportExtensions
             var content = SerializeElement(resp.Value, version, format);
             
             SaveToFile(filename, content);
+            SpecLogger.Log($"Exported Response: {resp.Key} to {filename}");
         }
+        SpecLogger.Log("Export Response finished.");
     }
 
     public static void ExportLinks(
@@ -152,6 +167,7 @@ public static class ExportExtensions
 
         if (!document.Components.Links.Any())
         {
+            SpecLogger.Log("No Links found!");
             return;
         }
 
@@ -164,7 +180,9 @@ public static class ExportExtensions
             var content = SerializeElement(link.Value, version, format);
             
             SaveToFile(filename, content);
+            SpecLogger.Log($"Exported Link: {link.Key} to {filename}");
         }
+        SpecLogger.Log("Export Links finished.");
     }
 
     public static void ExportCallbacks(
@@ -174,6 +192,7 @@ public static class ExportExtensions
 
         if (!document.Components.Callbacks.Any())
         {
+            SpecLogger.Log("No Callbacks found!");
             return;
         }
 
@@ -186,7 +205,9 @@ public static class ExportExtensions
             var content = SerializeElement(callback.Value, version, format);
             
             SaveToFile(filename, content);
+            SpecLogger.Log($"Exported Callback: {callback.Key} to {filename}");
         }
+        SpecLogger.Log("Export Callbacks finished.");
     }
 
     public static void ExportRequestBodies(
@@ -196,6 +217,7 @@ public static class ExportExtensions
 
         if (!document.Components.RequestBodies.Any())
         {
+            SpecLogger.Log("No RequestBody found!");
             return;
         }
 
@@ -208,7 +230,9 @@ public static class ExportExtensions
             var content = SerializeElement(requestBody.Value, version, format);
             
             SaveToFile(filename, content);
+            SpecLogger.Log($"Exported RequestBody: {requestBody.Key} to {filename}");
         }
+        SpecLogger.Log("Export RequestBodies finished.");
     }
 
     public static void ExportSecuritySchemes(
@@ -218,6 +242,7 @@ public static class ExportExtensions
 
         if (!document.Components.SecuritySchemes.Any())
         {
+            SpecLogger.Log("No SecurityScheme found!");
             return;
         }
 
@@ -230,7 +255,9 @@ public static class ExportExtensions
             var content = SerializeElement(securityScheme.Value, version, format);
             
             SaveToFile(filename, content);
+            SpecLogger.Log($"Exported SecurityScheme: {securityScheme.Key} to {filename}");
         }
+        SpecLogger.Log("Export SecurityScheme finished.");
     }
     
     private static void SaveToFile(string filePath, string content)
