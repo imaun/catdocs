@@ -164,6 +164,28 @@ public static class ExportExtensions
             SaveToFile(filename, content);
         }
     }
+
+    public static void ExportRequestBodies(
+        this OpenApiDocument document, string outputDir, OpenApiSpecVersion version, OpenApiFormat format)
+    {
+        ArgumentNullException.ThrowIfNull(document);
+
+        if (!document.Components.RequestBodies.Any())
+        {
+            return;
+        }
+
+        var requests_dir = Path.Combine(outputDir, "requestbodies");
+        CreateDirIfNotExists(requests_dir);
+
+        foreach (var requestBody in document.Components.RequestBodies)
+        {
+            var filename = Path.Combine(requests_dir, $"{requestBody.Key}.{format.GetFormatFileExtension()}");
+            var content = SerializeElement(requestBody.Value, version, format);
+            
+            SaveToFile(filename, content);
+        }
+    }
     
     private static void SaveToFile(string filePath, string content)
     {
