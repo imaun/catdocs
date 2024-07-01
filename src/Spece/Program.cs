@@ -3,7 +3,6 @@ using SpecEditor.Lib.OpenAPI;
 
 SpecLogger.EnableConsoleLogging();
 
-Console.WriteLine("Hello, World!");
 
 string fileName = "C:\\Users\\imun2\\Source\\openapi\\sample.json";
 
