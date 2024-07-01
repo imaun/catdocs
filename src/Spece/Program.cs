@@ -6,8 +6,9 @@ SpecLogger.EnableConsoleLogging();
 
 var rootCommand = new RootCommand
 {
-
+    
 };
+
 
 string fileName = "C:\\Users\\imun2\\Source\\openapi\\sample.json";
 

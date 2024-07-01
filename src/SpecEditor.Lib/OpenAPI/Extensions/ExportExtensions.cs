@@ -28,10 +28,20 @@ public static class ExportExtensions
             var filename = Path.Combine(
                 paths_dir, 
                 $"{GetNormalizedPathFilename(path.Key)}.{format.GetFormatFileExtension()}");
-            
-            var content = SerializeElement(path.Value, version, format);
-            SaveToFile(filename, content);
-            SpecLogger.Log($"Exported API Path: {path.Key} to {filename}");
+
+            try
+            {
+                var content = SerializeElement(path.Value, version, format);
+                SaveToFile(filename, content);
+            }
+            catch (Exception ex)
+            {
+                SpecLogger.Log($"{nameof(ExportPaths)} Exception: {ex.GetBaseException().Message}");
+            }
+            finally
+            {
+                SpecLogger.Log($"Exported API Path: {path.Key} to {filename}");    
+            }
         }
         SpecLogger.Log("Export API Paths finished.");
     }
