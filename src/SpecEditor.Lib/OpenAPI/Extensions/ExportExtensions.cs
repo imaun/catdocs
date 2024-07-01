@@ -269,6 +269,64 @@ public static class ExportExtensions
         }
         SpecLogger.Log("Export SecurityScheme finished.");
     }
+
+    private static void Export<T>(
+        T element, string outputDir, OpenApiSpecVersion version, OpenApiFormat format) where T : IOpenApiReferenceable
+    {
+        string elementTypeName = "";
+        string dir = "";
+        if (element is OpenApiSchema)
+        {
+            elementTypeName = OpenApiConstants.Schema;
+            dir = OpenApiConstants.Schema_Dir;
+        }
+
+        if (element is OpenApiParameter)
+        {
+            elementTypeName = OpenApiConstants.Parameter;
+            dir = OpenApiConstants.Parameter_Dir;
+        }
+
+        if (element is OpenApiExample)
+        {
+            elementTypeName = OpenApiConstants.Example;
+            dir = OpenApiConstants.Example_Dir;
+        }
+
+        if (element is OpenApiHeader)
+        {
+            elementTypeName = OpenApiConstants.Header;
+            dir = OpenApiConstants.Header_Dir;
+        }
+
+        if (element is OpenApiResponse)
+        {
+            elementTypeName = OpenApiConstants.Response;
+            dir = OpenApiConstants.Response_Dir;
+        }
+
+        if (element is OpenApiRequestBody)
+        {
+            elementTypeName = OpenApiConstants.RequestBody;
+            dir = OpenApiConstants.RequestBody_Dir;
+        }
+        
+        
+    }
+    
+    private static string SerializeElement<T>(
+        T element, OpenApiSpecVersion version, OpenApiFormat format) where T: IOpenApiReferenceable
+    {
+        using var stream = new MemoryStream();
+        element.Serialize(stream, version, format, new OpenApiWriterSettings
+        {
+            InlineLocalReferences = true,
+            InlineExternalReferences = true
+        });
+        stream.Position = 0;
+        
+        return new StreamReader(stream).ReadToEnd();
+    }
     
     private static void SaveToFile(string filePath, string content)
     {
@@ -304,17 +362,4 @@ public static class ExportExtensions
         }
     }
 
-    private static string SerializeElement<T>(
-        T element, OpenApiSpecVersion version, OpenApiFormat format) where T: IOpenApiReferenceable
-    {
-        using var stream = new MemoryStream();
-        element.Serialize(stream, version, format, new OpenApiWriterSettings
-        {
-            InlineLocalReferences = true,
-            InlineExternalReferences = true
-        });
-        stream.Position = 0;
-        
-        return new StreamReader(stream).ReadToEnd();
-    }
 }

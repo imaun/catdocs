@@ -157,7 +157,6 @@ public class OpenAPISpecParser
         _document.ExportRequestBodies(outputDir, _version, _format);
         _document.ExportSecuritySchemes(outputDir, _version, _format);
         
-        
         stop_watch.Stop();
         _splitTime = stop_watch.ElapsedMilliseconds;
         SpecLogger.Log($"Split completed in : {_splitTime} ms");
