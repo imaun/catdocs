@@ -1,8 +1,13 @@
 ﻿using Microsoft.OpenApi;
 using SpecEditor.Lib.OpenAPI;
+using System.CommandLine;
 
 SpecLogger.EnableConsoleLogging();
 
+var rootCommand = new RootCommand
+{
+
+};
 
 string fileName = "C:\\Users\\imun2\\Source\\openapi\\sample.json";
 
