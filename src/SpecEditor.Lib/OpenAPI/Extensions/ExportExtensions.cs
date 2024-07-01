@@ -26,7 +26,7 @@ public static class ExportExtensions
         foreach (var path in document.Paths)
         {
             var filename = Path.Combine(
-                paths_dir, 
+                paths_dir,
                 $"{GetNormalizedPathFilename(path.Key)}.{format.GetFormatFileExtension()}");
 
             try
@@ -40,12 +40,13 @@ public static class ExportExtensions
             }
             finally
             {
-                SpecLogger.Log($"Exported API Path: {path.Key} to {filename}");    
+                SpecLogger.Log($"Exported API Path: {path.Key} to {filename}");
             }
         }
+
         SpecLogger.Log("Export API Paths finished.");
     }
-    
+
     public static void ExportSchemas(
         this OpenApiDocument document, string outputDir, OpenApiSpecVersion version, OpenApiFormat format)
     {
@@ -56,18 +57,19 @@ public static class ExportExtensions
             SpecLogger.Log("No Schema found!");
             return;
         }
-        
+
         var schema_dir = Path.Combine(outputDir, $"schemas");
         CreateDirIfNotExists(schema_dir);
-        
+
         foreach (var schema in document.Components.Schemas)
         {
             var filename = Path.Combine(schema_dir, $"{schema.Key}.{format.GetFormatFileExtension()}");
             var content = SerializeElement(schema.Value, version, format);
-            
+
             SpecLogger.Log($"Exported Schema: {schema.Key} to {filename}");
             SaveToFile(filename, content);
         }
+
         SpecLogger.Log("Export Schemas finished.");
     }
 
@@ -90,13 +92,14 @@ public static class ExportExtensions
         {
             var filename = Path.Combine(parameters_dir, $"{param.Key}.{format.GetFormatFileExtension()}");
             var content = SerializeElement(param.Value, version, format);
-            
+
             SaveToFile(filename, content);
             SpecLogger.Log($"Exported Parameter: {param.Key} to {filename}");
         }
+
         SpecLogger.Log("Export Parameters finished.");
     }
-    
+
     public static void ExportExamples(
         this OpenApiDocument document, string outputDir, OpenApiSpecVersion version, OpenApiFormat format)
     {
@@ -115,10 +118,11 @@ public static class ExportExtensions
         {
             var filename = Path.Combine(examples_dir, $"{example.Key}.{format.GetFormatFileExtension()}");
             var content = SerializeElement(example.Value, version, format);
-            
+
             SaveToFile(filename, content);
             SpecLogger.Log($"Exported Example: {example.Key} to {filename}");
         }
+
         SpecLogger.Log("Export Examples finished.");
     }
 
@@ -139,7 +143,7 @@ public static class ExportExtensions
         {
             var filename = Path.Combine(headers_dir, $"{header.Key}.{format.GetFormatFileExtension()}");
             var content = SerializeElement(header.Value, version, format);
-            
+
             SaveToFile(filename, content);
         }
     }
@@ -163,10 +167,11 @@ public static class ExportExtensions
         {
             var filename = Path.Combine(responses_dir, $"{resp.Key}.{format.GetFormatFileExtension()}");
             var content = SerializeElement(resp.Value, version, format);
-            
+
             SaveToFile(filename, content);
             SpecLogger.Log($"Exported Response: {resp.Key} to {filename}");
         }
+
         SpecLogger.Log("Export Response finished.");
     }
 
@@ -188,10 +193,11 @@ public static class ExportExtensions
         {
             var filename = Path.Combine(links_dir, $"{link.Key}.{format.GetFormatFileExtension()}");
             var content = SerializeElement(link.Value, version, format);
-            
+
             SaveToFile(filename, content);
             SpecLogger.Log($"Exported Link: {link.Key} to {filename}");
         }
+
         SpecLogger.Log("Export Links finished.");
     }
 
@@ -213,10 +219,11 @@ public static class ExportExtensions
         {
             var filename = Path.Combine(callbacks_dir, $"{callback.Key}.{format.GetFormatFileExtension()}");
             var content = SerializeElement(callback.Value, version, format);
-            
+
             SaveToFile(filename, content);
             SpecLogger.Log($"Exported Callback: {callback.Key} to {filename}");
         }
+
         SpecLogger.Log("Export Callbacks finished.");
     }
 
@@ -238,10 +245,11 @@ public static class ExportExtensions
         {
             var filename = Path.Combine(requests_dir, $"{requestBody.Key}.{format.GetFormatFileExtension()}");
             var content = SerializeElement(requestBody.Value, version, format);
-            
+
             SaveToFile(filename, content);
             SpecLogger.Log($"Exported RequestBody: {requestBody.Key} to {filename}");
         }
+
         SpecLogger.Log("Export RequestBodies finished.");
     }
 
@@ -258,62 +266,170 @@ public static class ExportExtensions
 
         var security_schemes_dir = Path.Combine(outputDir, "securityschemes");
         CreateDirIfNotExists(security_schemes_dir);
-        
+
         foreach (var securityScheme in document.Components.SecuritySchemes)
         {
-            var filename = Path.Combine(security_schemes_dir, $"{securityScheme.Key}.{format.GetFormatFileExtension()}");
+            var filename = Path.Combine(security_schemes_dir,
+                $"{securityScheme.Key}.{format.GetFormatFileExtension()}");
             var content = SerializeElement(securityScheme.Value, version, format);
-            
+
             SaveToFile(filename, content);
             SpecLogger.Log($"Exported SecurityScheme: {securityScheme.Key} to {filename}");
         }
+
         SpecLogger.Log("Export SecurityScheme finished.");
     }
 
     private static void Export<T>(
-        T element, string outputDir, OpenApiSpecVersion version, OpenApiFormat format) where T : IOpenApiReferenceable
+        IDictionary<string, T> elements, string outputDir, OpenApiSpecVersion version, OpenApiFormat format)
+        where T : IOpenApiReferenceable
     {
-        string elementTypeName = "";
-        string dir = "";
-        if (element is OpenApiSchema)
-        {
-            elementTypeName = OpenApiConstants.Schema;
-            dir = OpenApiConstants.Schema_Dir;
-        }
+        // string elementTypeName = GetOpenApiElementTypeName(element);
+        // string dir = Path.Combine(outputDir, GetOpenApiElementDirectoryName(element));
 
-        if (element is OpenApiParameter)
-        {
-            elementTypeName = OpenApiConstants.Parameter;
-            dir = OpenApiConstants.Parameter_Dir;
-        }
 
-        if (element is OpenApiExample)
-        {
-            elementTypeName = OpenApiConstants.Example;
-            dir = OpenApiConstants.Example_Dir;
-        }
 
-        if (element is OpenApiHeader)
-        {
-            elementTypeName = OpenApiConstants.Header;
-            dir = OpenApiConstants.Header_Dir;
-        }
-
-        if (element is OpenApiResponse)
-        {
-            elementTypeName = OpenApiConstants.Response;
-            dir = OpenApiConstants.Response_Dir;
-        }
-
-        if (element is OpenApiRequestBody)
-        {
-            elementTypeName = OpenApiConstants.RequestBody;
-            dir = OpenApiConstants.RequestBody_Dir;
-        }
-        
-        
     }
-    
+
+    private static string GetOpenApiElementTypeName<T>(T element) where T : IOpenApiReferenceable
+    {
+        ArgumentNullException.ThrowIfNull(element);
+
+        return element switch
+        {
+            OpenApiSchema => OpenApiConstants.Schema,
+            OpenApiParameter => OpenApiConstants.Parameter,
+            OpenApiExample => OpenApiConstants.Example,
+            OpenApiHeader => OpenApiConstants.Header,
+            OpenApiResponse => OpenApiConstants.Response,
+            OpenApiRequestBody => OpenApiConstants.RequestBody,
+            OpenApiLink => OpenApiConstants.Link,
+            OpenApiCallback => OpenApiConstants.Callback,
+            OpenApiSecurityScheme => OpenApiConstants.SecurityScheme,
+            _ => throw new NotSupportedException("OpenAPI type not supported!")
+        };
+    }
+
+    private static string GetOpenApiElementTypeName(Type type)
+    {
+        if (type is OpenApiSchema)
+        {
+            return OpenApiConstants.Schema;
+        }
+
+        if (type is OpenApiParameter)
+        {
+            return OpenApiConstants.Parameter;
+        }
+
+        if (type is OpenApiExample)
+        {
+            return OpenApiConstants.Example;
+        }
+
+        if (type is OpenApiHeader)
+        {
+            return OpenApiConstants.Header;
+        }
+
+        if (type is OpenApiResponse)
+        {
+            return OpenApiConstants.Response;
+        }
+
+        if (type is OpenApiRequestBody)
+        {
+            return OpenApiConstants.RequestBody;
+        }
+
+        if (type is OpenApiLink)
+        {
+            return OpenApiConstants.Link;
+        }
+
+        if (type is OpenApiCallback)
+        {
+            return OpenApiConstants.Callback;
+        }
+
+        if (type is OpenApiSecurityScheme)
+        {
+            return OpenApiConstants.SecurityScheme;
+        }
+
+        throw new NotSupportedException("OpenAPI type not supported!");
+    }
+
+    private static string GetOpenApiElementDirectoryName<T>(T element) where T : IOpenApiReferenceable
+    {
+        ArgumentNullException.ThrowIfNull(element);
+
+        return element switch
+        {
+            OpenApiSchema => OpenApiConstants.Schema_Dir,
+            OpenApiParameter => OpenApiConstants.Parameter_Dir,
+            OpenApiExample => OpenApiConstants.Example_Dir,
+            OpenApiHeader => OpenApiConstants.Header_Dir,
+            OpenApiResponse => OpenApiConstants.Response_Dir,
+            OpenApiRequestBody => OpenApiConstants.RequestBody_Dir,
+            OpenApiLink => OpenApiConstants.Link_Dir,
+            OpenApiCallback => OpenApiConstants.Callback_Dir,
+            OpenApiSecurityScheme => OpenApiConstants.SecurityScheme_Dir,
+            _ => throw new NotSupportedException("OpenAPI type not supported!")
+        };
+    }
+
+    private static string GetOpenApiElementDirectoryName(Type type)
+    {
+        if (type is OpenApiSchema)
+        {
+            return OpenApiConstants.Schema_Dir;
+        }
+
+        if (type is OpenApiParameter)
+        {
+            return OpenApiConstants.Parameter_Dir;
+        }
+
+        if (type is OpenApiExample)
+        {
+            return OpenApiConstants.Example_Dir;
+        }
+
+        if (type is OpenApiHeader)
+        {
+            return OpenApiConstants.Header_Dir;
+        }
+
+        if (type is OpenApiResponse)
+        {
+            return OpenApiConstants.Response_Dir;
+        }
+
+        if (type is OpenApiRequestBody)
+        {
+            return OpenApiConstants.RequestBody_Dir;
+        }
+
+        if (type is OpenApiLink)
+        {
+            return OpenApiConstants.Link_Dir;
+        }
+
+        if (type is OpenApiCallback)
+        {
+            return OpenApiConstants.Callback_Dir;
+        }
+
+        if (type is OpenApiSecurityScheme)
+        {
+            return OpenApiConstants.SecurityScheme_Dir;
+        }
+
+        throw new NotSupportedException("OpenAPI type not supported!");
+    }
+
+
     private static string SerializeElement<T>(
         T element, OpenApiSpecVersion version, OpenApiFormat format) where T: IOpenApiReferenceable
     {
