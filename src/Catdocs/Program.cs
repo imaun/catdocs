@@ -1,14 +1,12 @@
 ﻿using Microsoft.OpenApi;
 using Catdocs.Lib.OpenAPI;
-using System.CommandLine;
+using Spece.Commands;
 
 SpecLogger.EnableConsoleLogging();
 
-var rootCommand = new RootCommand
-{
-    
-};
+await MainCommand.InvokeAsync(args);
 
+Environment.Exit(0);
 
 string fileName = "C:\\Users\\imun2\\Source\\openapi\\sample.json";
 
