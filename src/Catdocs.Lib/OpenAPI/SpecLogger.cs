@@ -1,4 +1,6 @@
-﻿namespace Catdocs.Lib.OpenAPI;
+﻿using System.Text;
+
+namespace Catdocs.Lib.OpenAPI;
 
 public static class SpecLogger
 {
@@ -16,6 +18,16 @@ public static class SpecLogger
         var fileName = Path.GetFileNameWithoutExtension(filePath);
         var now = DateTime.Now;
         Filename = $"{fileName}-{now.Date.ToShortDateString()}-{now.ToShortTimeString()}.log";
+    }
+
+    public static void LogException(Exception exception)
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine($"Exception: {exception.GetType()}");
+        sb.AppendLine($"    Message: {exception.GetBaseException().Message}");
+        sb.AppendLine($"    StackTrace: {exception.GetBaseException().StackTrace}");
+        
+        Log(sb.ToString());
     }
 
     public static void Log(string log)

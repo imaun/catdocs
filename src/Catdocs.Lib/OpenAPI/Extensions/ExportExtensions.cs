@@ -284,11 +284,28 @@ public static class ExportExtensions
         IDictionary<string, T> elements, string outputDir, OpenApiSpecVersion version, OpenApiFormat format)
         where T : IOpenApiReferenceable
     {
-        // string elementTypeName = GetOpenApiElementTypeName(element);
-        // string dir = Path.Combine(outputDir, GetOpenApiElementDirectoryName(element));
+        string elementTypeName = GetOpenApiElementTypeName(typeof(T));
+        string dir = Path.Combine(outputDir, GetOpenApiElementDirectoryName(typeof(T)));
+        
+        CreateDirIfNotExists(dir);
 
-
-
+        foreach (var el in elements)
+        {
+            var filename = Path.Combine(dir, $"{el.Key}.{format.GetFormatFileExtension()}");
+            try
+            {
+                var content = SerializeElement(el.Value, version, format);
+                SaveToFile(filename, content);
+            }
+            catch (Exception ex)
+            {
+                
+            }
+            
+            SpecLogger.Log($"Exported {elementTypeName}: {el.Key} to {filename}");
+        }
+        
+        SpecLogger.Log($"Export {elementTypeName} finished.");
     }
 
     private static string GetOpenApiElementTypeName<T>(T element) where T : IOpenApiReferenceable
