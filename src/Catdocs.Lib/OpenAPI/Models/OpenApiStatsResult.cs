@@ -12,14 +12,14 @@ public record OpenApiStatsResult(
     public override string ToString()
     {
         var sb = new StringBuilder();
-        sb.AppendLine($"PathItems : {PathItemsCount}")
-            .AppendLine($"Operations : {OperationsCount}")
-            .AppendLine($"Parameters : {ParametersCount}")
-            .AppendLine($"RequestBodies : {RequestBodyCount}")
-            .AppendLine($"Responses : {ResponsesCount}")
-            .AppendLine($"Links : {LinkesCount}")
-            .AppendLine($"Callbacks : {CallbacksCount}")
-            .AppendLine($"Schemas : {SchemasCount}");
+        sb.AppendLine($"⛳ PathItems : {PathItemsCount}")
+            .AppendLine($"🦺 Operations : {OperationsCount}")
+            .AppendLine($"🧩 Parameters : {ParametersCount}")
+            .AppendLine($"📃 RequestBodies : {RequestBodyCount}")
+            .AppendLine($"📗 Responses : {ResponsesCount}")
+            .AppendLine($"🔗 Links : {LinkesCount}")
+            .AppendLine($"📞 Callbacks : {CallbacksCount}")
+            .AppendLine($"📜 Schemas : {SchemasCount}");
 
         return sb.ToString();
     }

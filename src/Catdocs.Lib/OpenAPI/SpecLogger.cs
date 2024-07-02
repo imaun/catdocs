@@ -17,7 +17,7 @@ public static class SpecLogger
     {
         var fileName = Path.GetFileNameWithoutExtension(filePath);
         var now = DateTime.Now;
-        Filename = $"{fileName}-{now.Date.ToShortDateString()}-{now.ToShortTimeString()}.log";
+        Filename = $"{fileName}-{now:yyyy-mm-dd HH-MM}.log";
     }
 
     public static void LogException(string name, Exception exception)

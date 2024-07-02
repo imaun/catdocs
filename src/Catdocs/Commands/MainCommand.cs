@@ -1,4 +1,6 @@
 ﻿using System.CommandLine;
+using Catdocs.Lib.OpenAPI;
+using Microsoft.OpenApi;
 
 namespace Catdocs.Commands;
 
@@ -6,29 +8,93 @@ public static class MainCommand
 {
     private static RootCommand _command = new();
 
-    private static Option<string> _pathOption = new(
-        name: "path", 
+    private static Option<FileInfo> _fileOption = new(
+        aliases: ["--file", "--source", "--spec", "-s"], 
         description: "The path to OpenAPI spec file.");
 
-    private static Argument<string> _openApiVersion = new(
-        "--version",
+    private static Option<string> _openApiVersionArg = new(
+        aliases: ["--spec-version", "--spec-ver", "-v"],
         getDefaultValue: () => "3.0",
         description: "OpenAPI Spec version (2.0 or 3.0)");
 
-    private static Argument<string> _openApiFormat = new(
-        "--format",
+    private static Option<string> _openApiFormatArg = new(
+        aliases: ["--format", "--f", "-f"],
         getDefaultValue: () => "yaml",
         description: "OpenAPI Spec format (yaml or json)");
 
     public static async Task InvokeAsync(string[] args)
     {
-        _command.AddOption(_pathOption);
+        _command.AddOption(_fileOption);
+        _command.AddOption(_openApiVersionArg);
+        _command.AddOption(_openApiFormatArg);
         
-        _command.SetHandler((path, version, format) =>
-        {
-            Console.WriteLine($"Hello {path}");
-        }, _pathOption, _openApiVersion, _openApiFormat);
+        _command.SetHandler(Run, _fileOption, _openApiVersionArg, _openApiFormatArg);
 
         await _command.InvokeAsync(args);
+    }
+
+    public static void Run(FileInfo file, string version, string format)
+    {
+        if (file is null)
+        {
+            Console.WriteLine("Error: Filename is not valid!");
+            return;
+        }
+
+        if (!file.Exists)
+        {
+            Console.WriteLine($"Error: File '{file.Name}' not found!");
+            return;
+        }
+        
+        var spec_version = OpenApiSpecVersion.OpenApi3_0;
+        var spec_format = OpenApiFormat.Yaml;
+
+        if (version == "2.0" || version == "2")
+        {
+            spec_version = OpenApiSpecVersion.OpenApi2_0;
+        }
+        else if (version == "3.0" || version == "3")
+        {
+            spec_version = OpenApiSpecVersion.OpenApi3_0;
+        }
+        else
+        {
+            Console.WriteLine("Error: OpenApiSpec Version is not valid!");
+            return;
+        }
+
+        if (format.ToLower() == "json")
+        {
+            spec_format = OpenApiFormat.Json;
+        }
+        else if (format.ToLower() == "yaml")
+        {
+            spec_format = OpenApiFormat.Yaml;
+        }
+        else
+        {
+            Console.WriteLine("Error: OpenApiSpec format is not valid!");
+            return;
+        }
+
+        var parser = new OpenAPISpecParser(
+            file.FullName, spec_version, spec_format, true, true);
+
+        var parse_result = parser.Load();
+        if (parse_result.HasErrors)
+        {
+            Console.WriteLine("🩻 Found some errors: ");
+            parse_result.Errors.WriteListToConsole();
+            
+            return;
+        }
+
+        var stats = parser.GetStats();
+        Console.WriteLine($"File: {file.FullName}");
+        Console.WriteLine("Status: ✅ OK");
+        Console.WriteLine();
+        
+        stats.WriteToConsole();
     }
 }

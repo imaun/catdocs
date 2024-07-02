@@ -2,7 +2,7 @@
 
 namespace Catdocs.Lib.OpenAPI;
 
-internal static class OpenApiExtensions
+public static class OpenApiExtensions
 {
 
     public static string ToStr(this OpenApiSpecVersion version)
@@ -42,5 +42,18 @@ internal static class OpenApiExtensions
             return "yaml";
 
         return "txt";
+    }
+
+    public static void WriteListToConsole(this List<string> list)
+    {
+        foreach (var item in list)
+        {
+            Console.WriteLine(item);
+        }
+    }
+
+    public static void WriteToConsole(this OpenApiStatsResult stats)
+    {
+        Console.WriteLine(stats);
     }
 }
