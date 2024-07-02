@@ -84,15 +84,17 @@ public static class MainCommand
         var parse_result = parser.Load();
         if (parse_result.HasErrors)
         {
-            Console.WriteLine("🩻 Found some errors: ");
-            parse_result.Errors.WriteListToConsole();
+            ConsoleExtensions.WriteErrorLine("🩻 Found some errors: ");
+            parse_result.Errors.WriteListToConsole(useLineNo: true, useTab: true, color: ConsoleColor.Red);
             
             return;
         }
 
         var stats = parser.GetStats();
+        Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine($"File: {file.FullName}");
         Console.WriteLine("Status: ✅ OK");
+        Console.ResetColor();
         Console.WriteLine();
         
         stats.WriteToConsole();
