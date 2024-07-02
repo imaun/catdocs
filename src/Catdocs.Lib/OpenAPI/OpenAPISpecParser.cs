@@ -5,7 +5,7 @@ using Microsoft.OpenApi.Readers;
 using Microsoft.OpenApi.Services;
 using System.Diagnostics;
 
-namespace SpecEditor.Lib.OpenAPI;
+namespace Catdocs.Lib.OpenAPI;
 
 public class OpenAPISpecParser
 {

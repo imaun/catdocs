@@ -1,4 +1,4 @@
-﻿namespace SpecEditor.Lib.OpenAPI;
+﻿namespace Catdocs.Lib.OpenAPI;
 
 public record OpenApiSpecInfo(
     string InputFile,

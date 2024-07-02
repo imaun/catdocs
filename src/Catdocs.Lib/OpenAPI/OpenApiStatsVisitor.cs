@@ -1,7 +1,7 @@
 ﻿using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Services;
 
-namespace SpecEditor.Lib.OpenAPI;
+namespace Catdocs.Lib.OpenAPI;
 
 public class OpenApiStatsVisitor : OpenApiVisitorBase
 {

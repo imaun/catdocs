@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace SpecEditor.Lib.OpenAPI;
+namespace Catdocs.Lib.OpenAPI;
 
 public record OpenApiStatsResult(
     int PathItemsCount, int OperationsCount, int ParametersCount,

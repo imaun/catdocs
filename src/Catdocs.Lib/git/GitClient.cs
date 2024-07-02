@@ -1,6 +1,6 @@
 ﻿using LibGit2Sharp;
 
-namespace SpecEditor.Lib.git;
+namespace Catdocs.Lib.git;
 
 public class GitClient
 {

@@ -4,7 +4,7 @@ using Microsoft.OpenApi.Interfaces;
 using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Writers;
 
-namespace SpecEditor.Lib.OpenAPI;
+namespace Catdocs.Lib.OpenAPI;
 
 public static class ExportExtensions
 {

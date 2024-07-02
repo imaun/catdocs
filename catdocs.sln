@@ -5,9 +5,9 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{1A79F16E-4574-4E51-96AE-4B53296499F6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpecEditor.Lib", "src\SpecEditor.Lib\SpecEditor.Lib.csproj", "{F8521AAD-412E-4191-98FF-D966A2D682C3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Catdocs.Lib", "src\Catdocs.Lib\Catdocs.Lib.csproj", "{F8521AAD-412E-4191-98FF-D966A2D682C3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spece", "src\Spece\Spece.csproj", "{CD177B38-6B14-47E6-BA26-B85237D6C36B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Catdocs", "src\Catdocs\Catdocs.csproj", "{CD177B38-6B14-47E6-BA26-B85237D6C36B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

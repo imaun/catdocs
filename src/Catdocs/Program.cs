@@ -1,5 +1,5 @@
 ﻿using Microsoft.OpenApi;
-using SpecEditor.Lib.OpenAPI;
+using Catdocs.Lib.OpenAPI;
 using System.CommandLine;
 
 SpecLogger.EnableConsoleLogging();

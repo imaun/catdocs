@@ -1,6 +1,6 @@
 ﻿using Microsoft.OpenApi;
 
-namespace SpecEditor.Lib.OpenAPI;
+namespace Catdocs.Lib.OpenAPI;
 
 internal static class OpenApiExtensions
 {
