@@ -299,10 +299,12 @@ public static class ExportExtensions
             }
             catch (Exception ex)
             {
-                
+                SpecLogger.LogException(ex);
             }
-            
-            SpecLogger.Log($"Exported {elementTypeName}: {el.Key} to {filename}");
+            finally
+            {
+                SpecLogger.Log($"Exported {elementTypeName}: {el.Key} to {filename}");    
+            }
         }
         
         SpecLogger.Log($"Export {elementTypeName} finished.");
