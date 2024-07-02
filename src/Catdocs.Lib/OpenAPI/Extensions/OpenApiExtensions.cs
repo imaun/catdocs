@@ -44,16 +44,43 @@ public static class OpenApiExtensions
         return "txt";
     }
 
-    public static void WriteListToConsole(this List<string> list)
+    public static void WriteListToConsole(
+        this List<string> list,
+        bool useLineNo = false,
+        bool useTab = false, 
+        ConsoleColor color = ConsoleColor.White)
     {
+        if (!list.Any())
+        {
+            return;
+        }
+        
+        Console.ForegroundColor = color;
+        int lineNo = 1;
         foreach (var item in list)
         {
-            Console.WriteLine(item);
+            var output = item;
+            if (useLineNo)
+            {
+                output = $"{lineNo}: {output}";
+            }
+            
+            if (useTab)
+            {
+                output = $"     {output}";
+            }
+            
+            Console.WriteLine(output);
+
+            lineNo++;
         }
+        Console.ResetColor();
     }
 
     public static void WriteToConsole(this OpenApiStatsResult stats)
     {
+        Console.ForegroundColor = ConsoleColor.Magenta;
         Console.WriteLine(stats);
+        Console.ResetColor();
     }
 }
