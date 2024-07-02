@@ -1,6 +1,6 @@
 ﻿using Microsoft.OpenApi;
 using Catdocs.Lib.OpenAPI;
-using Spece.Commands;
+using Catdocs.Commands;
 
 SpecLogger.EnableConsoleLogging();
 
