@@ -20,10 +20,10 @@ public static class SpecLogger
         Filename = $"{fileName}-{now.Date.ToShortDateString()}-{now.ToShortTimeString()}.log";
     }
 
-    public static void LogException(Exception exception)
+    public static void LogException(string name, Exception exception)
     {
         var sb = new StringBuilder();
-        sb.AppendLine($"Exception: {exception.GetType()}");
+        sb.AppendLine($"{name} Exception: {exception.GetType()}");
         sb.AppendLine($"    Message: {exception.GetBaseException().Message}");
         sb.AppendLine($"    StackTrace: {exception.GetBaseException().StackTrace}");
         

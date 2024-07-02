@@ -57,20 +57,8 @@ public static class ExportExtensions
             SpecLogger.Log("No Schema found!");
             return;
         }
-
-        var schema_dir = Path.Combine(outputDir, $"schemas");
-        CreateDirIfNotExists(schema_dir);
-
-        foreach (var schema in document.Components.Schemas)
-        {
-            var filename = Path.Combine(schema_dir, $"{schema.Key}.{format.GetFormatFileExtension()}");
-            var content = SerializeElement(schema.Value, version, format);
-
-            SpecLogger.Log($"Exported Schema: {schema.Key} to {filename}");
-            SaveToFile(filename, content);
-        }
-
-        SpecLogger.Log("Export Schemas finished.");
+        
+        Export(document.Components.Schemas, outputDir, version, format);
     }
 
 
@@ -84,20 +72,8 @@ public static class ExportExtensions
             SpecLogger.Log("No Parameters found!");
             return;
         }
-
-        var parameters_dir = Path.Combine(outputDir, "parameters");
-        CreateDirIfNotExists(parameters_dir);
-
-        foreach (var param in document.Components.Parameters)
-        {
-            var filename = Path.Combine(parameters_dir, $"{param.Key}.{format.GetFormatFileExtension()}");
-            var content = SerializeElement(param.Value, version, format);
-
-            SaveToFile(filename, content);
-            SpecLogger.Log($"Exported Parameter: {param.Key} to {filename}");
-        }
-
-        SpecLogger.Log("Export Parameters finished.");
+        
+        Export(document.Components.Parameters, outputDir, version, format);
     }
 
     public static void ExportExamples(
@@ -111,19 +87,7 @@ public static class ExportExtensions
             return;
         }
 
-        var examples_dir = Path.Combine(outputDir, "examples");
-        CreateDirIfNotExists(examples_dir);
-
-        foreach (var example in document.Components.Examples)
-        {
-            var filename = Path.Combine(examples_dir, $"{example.Key}.{format.GetFormatFileExtension()}");
-            var content = SerializeElement(example.Value, version, format);
-
-            SaveToFile(filename, content);
-            SpecLogger.Log($"Exported Example: {example.Key} to {filename}");
-        }
-
-        SpecLogger.Log("Export Examples finished.");
+        Export(document.Components.Examples, outputDir, version, format);
     }
 
     public static void ExportHeaders(
@@ -136,16 +100,7 @@ public static class ExportExtensions
             return;
         }
 
-        var headers_dir = Path.Combine(outputDir, "headers");
-        CreateDirIfNotExists(headers_dir);
-
-        foreach (var header in document.Components.Headers)
-        {
-            var filename = Path.Combine(headers_dir, $"{header.Key}.{format.GetFormatFileExtension()}");
-            var content = SerializeElement(header.Value, version, format);
-
-            SaveToFile(filename, content);
-        }
+        Export(document.Components.Headers, outputDir, version, format);
     }
 
 
@@ -160,19 +115,7 @@ public static class ExportExtensions
             return;
         }
 
-        var responses_dir = Path.Combine(outputDir, "responses");
-        CreateDirIfNotExists(responses_dir);
-
-        foreach (var resp in document.Components.Responses)
-        {
-            var filename = Path.Combine(responses_dir, $"{resp.Key}.{format.GetFormatFileExtension()}");
-            var content = SerializeElement(resp.Value, version, format);
-
-            SaveToFile(filename, content);
-            SpecLogger.Log($"Exported Response: {resp.Key} to {filename}");
-        }
-
-        SpecLogger.Log("Export Response finished.");
+        Export(document.Components.Responses, outputDir, version, format);
     }
 
     public static void ExportLinks(
@@ -185,20 +128,8 @@ public static class ExportExtensions
             SpecLogger.Log("No Links found!");
             return;
         }
-
-        var links_dir = Path.Combine(outputDir, "links");
-        CreateDirIfNotExists(links_dir);
-
-        foreach (var link in document.Components.Links)
-        {
-            var filename = Path.Combine(links_dir, $"{link.Key}.{format.GetFormatFileExtension()}");
-            var content = SerializeElement(link.Value, version, format);
-
-            SaveToFile(filename, content);
-            SpecLogger.Log($"Exported Link: {link.Key} to {filename}");
-        }
-
-        SpecLogger.Log("Export Links finished.");
+        
+        Export(document.Components.Links, outputDir, version, format);
     }
 
     public static void ExportCallbacks(
@@ -212,19 +143,7 @@ public static class ExportExtensions
             return;
         }
 
-        var callbacks_dir = Path.Combine(outputDir, "callbacks");
-        CreateDirIfNotExists(callbacks_dir);
-
-        foreach (var callback in document.Components.Callbacks)
-        {
-            var filename = Path.Combine(callbacks_dir, $"{callback.Key}.{format.GetFormatFileExtension()}");
-            var content = SerializeElement(callback.Value, version, format);
-
-            SaveToFile(filename, content);
-            SpecLogger.Log($"Exported Callback: {callback.Key} to {filename}");
-        }
-
-        SpecLogger.Log("Export Callbacks finished.");
+        Export(document.Components.Callbacks, outputDir, version, format);
     }
 
     public static void ExportRequestBodies(
@@ -238,19 +157,7 @@ public static class ExportExtensions
             return;
         }
 
-        var requests_dir = Path.Combine(outputDir, "requestbodies");
-        CreateDirIfNotExists(requests_dir);
-
-        foreach (var requestBody in document.Components.RequestBodies)
-        {
-            var filename = Path.Combine(requests_dir, $"{requestBody.Key}.{format.GetFormatFileExtension()}");
-            var content = SerializeElement(requestBody.Value, version, format);
-
-            SaveToFile(filename, content);
-            SpecLogger.Log($"Exported RequestBody: {requestBody.Key} to {filename}");
-        }
-
-        SpecLogger.Log("Export RequestBodies finished.");
+        Export(document.Components.RequestBodies, outputDir, version, format);
     }
 
     public static void ExportSecuritySchemes(
@@ -264,20 +171,7 @@ public static class ExportExtensions
             return;
         }
 
-        var security_schemes_dir = Path.Combine(outputDir, "securityschemes");
-        CreateDirIfNotExists(security_schemes_dir);
-
-        foreach (var securityScheme in document.Components.SecuritySchemes)
-        {
-            var filename = Path.Combine(security_schemes_dir,
-                $"{securityScheme.Key}.{format.GetFormatFileExtension()}");
-            var content = SerializeElement(securityScheme.Value, version, format);
-
-            SaveToFile(filename, content);
-            SpecLogger.Log($"Exported SecurityScheme: {securityScheme.Key} to {filename}");
-        }
-
-        SpecLogger.Log("Export SecurityScheme finished.");
+        Export(document.Components.SecuritySchemes, outputDir, version, format);
     }
 
     private static void Export<T>(
@@ -299,7 +193,7 @@ public static class ExportExtensions
             }
             catch (Exception ex)
             {
-                SpecLogger.LogException(ex);
+                SpecLogger.LogException(elementTypeName, ex);
             }
             finally
             {
