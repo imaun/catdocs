@@ -1,2 +1,2 @@
-# spec-editor
-OpenAPI specification editor
+# Catdocs
+OpenAPI specification editor & tools
