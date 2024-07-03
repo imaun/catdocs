@@ -4,6 +4,7 @@ using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Readers;
 using Microsoft.OpenApi.Services;
 using System.Diagnostics;
+using Catdocs.Lib.OpenAPI.Internal;
 
 namespace Catdocs.Lib.OpenAPI;
 
@@ -143,20 +144,11 @@ public class OpenAPISpecParser
         stop_watch.Start();
         
         CreateDirIfNotExists(outputDir);
+
+        var splitter = new OpenApiDocSplitter(_document, _version, _format);
+        splitter.Split();
         
-        _document.ExportPaths(outputDir, _version, _format);
         //TODO: check if has components
-        
-        _document.ExportSchemas(outputDir, _version, _format);
-        _document.ExportParameters(outputDir, _version, _format);
-        _document.ExportExamples(outputDir, _version, _format);
-        _document.ExportHeaders(outputDir, _version, _format);
-        _document.ExportResponses(outputDir, _version, _format);
-        _document.ExportLinks(outputDir, _version, _format);
-        _document.ExportCallbacks(outputDir, _version, _format);
-        _document.ExportRequestBodies(outputDir, _version, _format);
-        //_document.ExportSecuritySchemes(outputDir, _version, _format);
-        
         stop_watch.Stop();
         _splitTime = stop_watch.ElapsedMilliseconds;
         SpecLogger.Log($"Split completed in : {_splitTime} ms");
