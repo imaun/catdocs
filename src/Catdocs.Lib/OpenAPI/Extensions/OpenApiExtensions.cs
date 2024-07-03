@@ -1,4 +1,6 @@
-﻿using Microsoft.OpenApi;
+﻿using System.Reflection.Metadata;
+using Microsoft.OpenApi;
+using Microsoft.OpenApi.Models;
 
 namespace Catdocs.Lib.OpenAPI;
 
@@ -42,6 +44,25 @@ public static class OpenApiExtensions
             return "yaml";
 
         return "txt";
+    }
+
+    public static ReferenceType? GetOpenApiReferenceType(this string elementTypeName)
+    {
+        return elementTypeName switch
+        {
+            OpenApiConstants.Schema => ReferenceType.Schema,
+            OpenApiConstants.Parameter => ReferenceType.Parameter,
+            OpenApiConstants.Callback => ReferenceType.Callback,
+            OpenApiConstants.Example => ReferenceType.Example,
+            OpenApiConstants.Header => ReferenceType.Header,
+            OpenApiConstants.Link => ReferenceType.Link,
+            OpenApiConstants.Response => ReferenceType.Response,
+            OpenApiConstants.RequestBody => ReferenceType.RequestBody,
+            OpenApiConstants.Path => ReferenceType.Path,
+            OpenApiConstants.Tag => ReferenceType.Tag,
+            OpenApiConstants.SecurityScheme => ReferenceType.SecurityScheme,
+            _ => throw new NotSupportedException("OpenAPI type not supported!")
+        };
     }
 
     public static void WriteListToConsole(

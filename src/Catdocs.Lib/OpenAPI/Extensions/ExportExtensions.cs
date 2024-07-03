@@ -20,7 +20,7 @@ public static class ExportExtensions
             return;
         }
 
-        var paths_dir = Path.Combine(outputDir, "paths");
+        var paths_dir = Path.Combine(outputDir, OpenApiConstants.Path_Dir);
         CreateDirIfNotExists(paths_dir);
 
         foreach (var path in document.Paths)
@@ -58,7 +58,7 @@ public static class ExportExtensions
             return;
         }
         
-        Export(document.Components.Schemas, outputDir, version, format);
+        document.Export(document.Components.Schemas, outputDir, version, format);
     }
 
 
@@ -73,7 +73,7 @@ public static class ExportExtensions
             return;
         }
         
-        Export(document.Components.Parameters, outputDir, version, format);
+        document.Export(document.Components.Parameters, outputDir, version, format);
     }
 
     public static void ExportExamples(
@@ -87,7 +87,7 @@ public static class ExportExtensions
             return;
         }
 
-        Export(document.Components.Examples, outputDir, version, format);
+        document.Export(document.Components.Examples, outputDir, version, format);
     }
 
     public static void ExportHeaders(
@@ -100,7 +100,7 @@ public static class ExportExtensions
             return;
         }
 
-        Export(document.Components.Headers, outputDir, version, format);
+        document.Export(document.Components.Headers, outputDir, version, format);
     }
 
 
@@ -115,7 +115,7 @@ public static class ExportExtensions
             return;
         }
 
-        Export(document.Components.Responses, outputDir, version, format);
+        document.Export(document.Components.Responses, outputDir, version, format);
     }
 
     public static void ExportLinks(
@@ -129,7 +129,7 @@ public static class ExportExtensions
             return;
         }
         
-        Export(document.Components.Links, outputDir, version, format);
+        document.Export(document.Components.Links, outputDir, version, format);
     }
 
     public static void ExportCallbacks(
@@ -143,7 +143,7 @@ public static class ExportExtensions
             return;
         }
 
-        Export(document.Components.Callbacks, outputDir, version, format);
+        document.Export(document.Components.Callbacks, outputDir, version, format);
     }
 
     public static void ExportRequestBodies(
@@ -157,24 +157,11 @@ public static class ExportExtensions
             return;
         }
 
-        Export(document.Components.RequestBodies, outputDir, version, format);
-    }
-
-    public static void ExportSecuritySchemes(
-        this OpenApiDocument document, string outputDir, OpenApiSpecVersion version, OpenApiFormat format)
-    {
-        ArgumentNullException.ThrowIfNull(document);
-
-        if (!document.Components.SecuritySchemes.Any())
-        {
-            SpecLogger.Log("No SecurityScheme found!");
-            return;
-        }
-
-        Export(document.Components.SecuritySchemes, outputDir, version, format);
+        document.Export(document.Components.RequestBodies, outputDir, version, format);
     }
 
     private static void Export<T>(
+        this OpenApiDocument document,
         IDictionary<string, T> elements, string outputDir, OpenApiSpecVersion version, OpenApiFormat format)
         where T : IOpenApiReferenceable
     {
@@ -182,14 +169,20 @@ public static class ExportExtensions
         string dir = Path.Combine(outputDir, GetOpenApiElementDirectoryName(typeof(T)));
         
         CreateDirIfNotExists(dir);
-
-        foreach (var el in elements)
+        
+        //Keep a clone of the current elements in the document
+        IDictionary<string, T> elementsClone = elements;
+        document.DeleteAllElementsOfType(elementTypeName);
+        
+        foreach (var el in elementsClone)
         {
             var filename = Path.Combine(dir, $"{el.Key}.{format.GetFormatFileExtension()}");
             try
             {
                 var content = SerializeElement(el.Value, version, format);
                 SaveToFile(filename, content);
+                
+                document.AddExternalReferenceFor(elementTypeName, el.Key, filename);
             }
             catch (Exception ex)
             {
@@ -197,7 +190,7 @@ public static class ExportExtensions
             }
             finally
             {
-                SpecLogger.Log($"Exported {elementTypeName}: {el.Key} to {filename}");    
+                SpecLogger.Log($"Exported {elementTypeName}: {el.Key} to {filename}");
             }
         }
         
@@ -287,7 +280,6 @@ public static class ExportExtensions
             OpenApiRequestBody => OpenApiConstants.RequestBody_Dir,
             OpenApiLink => OpenApiConstants.Link_Dir,
             OpenApiCallback => OpenApiConstants.Callback_Dir,
-            OpenApiSecurityScheme => OpenApiConstants.SecurityScheme_Dir,
             _ => throw new NotSupportedException("OpenAPI type not supported!")
         };
     }
@@ -332,11 +324,6 @@ public static class ExportExtensions
         if (type == typeof(OpenApiCallback))
         {
             return OpenApiConstants.Callback_Dir;
-        }
-
-        if (type == typeof(OpenApiSecurityScheme))
-        {
-            return OpenApiConstants.SecurityScheme_Dir;
         }
 
         throw new NotSupportedException("OpenAPI type not supported!");
@@ -391,4 +378,150 @@ public static class ExportExtensions
         }
     }
 
+    private static void DeleteAllElementsOfType(this OpenApiDocument document, string elementTypeName)
+    {
+        switch (elementTypeName)
+        {
+            case OpenApiConstants.Schema:
+                document.Components.Schemas = new Dictionary<string, OpenApiSchema>();
+                break;
+            case OpenApiConstants.Parameter:
+                document.Components.Parameters = new Dictionary<string, OpenApiParameter>();
+                break;
+            case OpenApiConstants.Callback:
+                document.Components.Callbacks = new Dictionary<string, OpenApiCallback>();
+                break;
+            case OpenApiConstants.Example:
+                document.Components.Examples = new Dictionary<string, OpenApiExample>();
+                break;
+            case OpenApiConstants.Header:
+                document.Components.Headers = new Dictionary<string, OpenApiHeader>();
+                break;
+            case OpenApiConstants.Link:
+                document.Components.Links = new Dictionary<string, OpenApiLink>();
+                break;
+            case OpenApiConstants.Response:
+                document.Components.Responses = new Dictionary<string, OpenApiResponse>();
+                break;
+            case OpenApiConstants.RequestBody:
+                document.Components.RequestBodies = new Dictionary<string, OpenApiRequestBody>();
+                break;
+        }
+    }
+
+    private static void AddExternalReferenceFor(
+        this OpenApiDocument document, string elementTypeName, string key, string filePath)
+    {
+        switch (elementTypeName)
+        {
+            case OpenApiConstants.Schema:
+                document.Components.Schemas.Add(key, new OpenApiSchema
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Id = key,
+                        Type = elementTypeName.GetOpenApiReferenceType(),
+                        ExternalResource = filePath
+                    }
+                });
+                break;
+            
+            case OpenApiConstants.Parameter:
+                document.Components.Parameters.Add(key, new OpenApiParameter
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Id = key,
+                        Type = elementTypeName.GetOpenApiReferenceType(),
+                        ExternalResource = filePath
+                    }
+                });
+                break;
+            
+            case OpenApiConstants.Callback:
+                document.Components.Callbacks.Add(key, new OpenApiCallback
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Id = key,
+                        Type = elementTypeName.GetOpenApiReferenceType(),
+                        ExternalResource = filePath
+                    }
+                });
+                break;
+            
+            case OpenApiConstants.Example:
+                document.Components.Examples.Add(key, new OpenApiExample
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Id = key,
+                        Type = elementTypeName.GetOpenApiReferenceType(),
+                        ExternalResource = filePath
+                    }
+                });
+                break;
+            
+            case OpenApiConstants.Header:
+                document.Components.Headers.Add(key, new OpenApiHeader
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Id = key,
+                        Type = elementTypeName.GetOpenApiReferenceType(),
+                        ExternalResource = filePath
+                    }
+                });
+                break;
+            
+            case OpenApiConstants.Link:
+                document.Components.Links.Add(key, new OpenApiLink
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Id = key,
+                        Type = elementTypeName.GetOpenApiReferenceType(),
+                        ExternalResource = filePath
+                    }
+                });
+                break;
+            
+            case OpenApiConstants.Response:
+                document.Components.Responses.Add(key, new OpenApiResponse
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Id = key,
+                        Type = elementTypeName.GetOpenApiReferenceType(),
+                        ExternalResource = filePath
+                    }
+                });
+                break;
+            
+            case OpenApiConstants.RequestBody:
+                document.Components.RequestBodies.Add(key, new OpenApiRequestBody
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Id = key,
+                        Type = elementTypeName.GetOpenApiReferenceType(),
+                        ExternalResource = filePath
+                    }
+                });
+                break;
+            
+            case OpenApiConstants.Path:
+                document.Paths.Add(key, new OpenApiPathItem
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Id = key,
+                        Type = elementTypeName.GetOpenApiReferenceType(),
+                        ExternalResource = filePath
+                    }
+                });
+                break;
+            
+        }
+    }
 }
