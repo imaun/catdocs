@@ -116,7 +116,7 @@ public class OpenAPISpecParser
         }
 
         var stream = new MemoryStream();
-
+        
         _document.Serialize(
             stream,
             _version,
@@ -132,7 +132,7 @@ public class OpenAPISpecParser
         return new StreamReader(stream).ReadToEnd();
     }
 
-    public void SplitToExternalFiles(string outputDir)
+    public void Split(string outputDir)
     {
         if (string.IsNullOrWhiteSpace(outputDir))
         {
@@ -155,7 +155,7 @@ public class OpenAPISpecParser
         _document.ExportLinks(outputDir, _version, _format);
         _document.ExportCallbacks(outputDir, _version, _format);
         _document.ExportRequestBodies(outputDir, _version, _format);
-        _document.ExportSecuritySchemes(outputDir, _version, _format);
+        //_document.ExportSecuritySchemes(outputDir, _version, _format);
         
         stop_watch.Stop();
         _splitTime = stop_watch.ElapsedMilliseconds;

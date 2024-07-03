@@ -96,7 +96,7 @@ public static class SplitCommand
             return;
         }
 
-        parser.SplitToExternalFiles(outputDir);
+        parser.Split(outputDir);
         Console.WriteLine($"Split took : {parser.SplitTime} ms");
     }
 }

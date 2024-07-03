@@ -40,7 +40,7 @@ Console.WriteLine(stats.ToString());
 var outputDir = "C:\\Users\\imun2\\Source\\openapi\\__out";
 Console.WriteLine($"Start splitting to {outputDir}");
 
-parser.SplitToExternalFiles(outputDir);
+parser.Split(outputDir);
 
 Console.WriteLine($"Split finished in {parser.SplitTime} ms");
 
