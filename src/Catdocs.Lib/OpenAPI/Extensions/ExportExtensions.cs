@@ -149,7 +149,7 @@ public static class ExportExtensions
         element.Serialize(stream, version, format, new OpenApiWriterSettings
         {
             InlineLocalReferences = true,
-            InlineExternalReferences = true
+            InlineExternalReferences = false
         });
         stream.Position = 0;
         
@@ -163,8 +163,8 @@ public static class ExportExtensions
         using var stream = new MemoryStream();
         document.Serialize(stream, version, format, new OpenApiWriterSettings
         {
-            InlineLocalReferences = true,
-            InlineExternalReferences = false
+            InlineLocalReferences = false,
+            InlineExternalReferences = true
         });
         stream.Position = 0;
 
