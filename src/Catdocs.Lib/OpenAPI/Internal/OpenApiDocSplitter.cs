@@ -77,7 +77,10 @@ internal class OpenApiDocSplitter
         
         SpecLogger.Log("Export API Paths finished.");
         
-        
+        var documentFilename = $"{_outputDir}{Path.DirectorySeparatorChar}OpenApi{_format.GetFormatFileExtension()}";
+        var documentContent = _document.SerializeDocument(_version, _format);
+        SaveToFile(documentFilename, documentContent);
+        SpecLogger.Log($"Main document created at : {documentFilename}");
         
         ExportComponents();
     }

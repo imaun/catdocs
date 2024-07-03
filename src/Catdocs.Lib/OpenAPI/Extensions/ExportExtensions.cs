@@ -156,6 +156,21 @@ public static class ExportExtensions
         return new StreamReader(stream).ReadToEnd();
     }
 
+
+    public static string SerializeDocument(
+        this OpenApiDocument document, OpenApiSpecVersion version, OpenApiFormat format)
+    {
+        using var stream = new MemoryStream();
+        document.Serialize(stream, version, format, new OpenApiWriterSettings
+        {
+            InlineLocalReferences = true,
+            InlineExternalReferences = false
+        });
+        stream.Position = 0;
+
+        return new StreamReader(stream).ReadToEnd();
+    }
+
     
     public static void DeleteAllElementsOfType(this OpenApiComponents components, string elementTypeName)
     {
