@@ -142,10 +142,8 @@ public class OpenAPISpecParser
 
         var stop_watch = new Stopwatch();
         stop_watch.Start();
-        
-        CreateDirIfNotExists(outputDir);
 
-        var splitter = new OpenApiDocSplitter(_document, _version, _format);
+        var splitter = new OpenApiDocSplitter(outputDir, _document, _version, _format);
         splitter.Split();
         
         //TODO: check if has components

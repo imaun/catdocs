@@ -13,6 +13,7 @@ internal class OpenApiDocSplitter
     private OpenApiSpecVersion _version;
 
     public OpenApiDocSplitter(
+        string outputDir,
         OpenApiDocument document,
         OpenApiSpecVersion version = OpenApiSpecVersion.OpenApi3_0,
         OpenApiFormat format = OpenApiFormat.Yaml
@@ -23,6 +24,9 @@ internal class OpenApiDocSplitter
         _document = document;
         _version = version;
         _format = format;
+
+        _outputDir = outputDir;
+        CreateDirIfNotExists(_outputDir);
     }
 
 
@@ -72,6 +76,8 @@ internal class OpenApiDocSplitter
         }
         
         SpecLogger.Log("Export API Paths finished.");
+        
+        
         
         ExportComponents();
     }
