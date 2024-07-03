@@ -32,14 +32,13 @@ Catdocs is an OpenAPI documentation tool that streamlines the process of managin
 
 ## Getting Started
 
-For detailed usage information, refer to the [User Manual](docs/user_manual.md).
 
 ## Contributing
 
 We welcome contributions!
 
 ## License
-
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ## Contact
 
