@@ -4,10 +4,11 @@ using Microsoft.OpenApi;
 
 namespace Catdocs.Commands;
 
-public static class MainCommand
+public static class SplitCommand
 {
-    private static RootCommand _command = new("stats");
-
+    private static Command _command = 
+        new("split", "Split the OpenAPI Specification into multiple external files");
+    
     private static Option<FileInfo> _fileOption = new(
         aliases: ["--file", "--source", "--spec", "-s"], 
         description: "The path to OpenAPI spec file.");
@@ -22,20 +23,23 @@ public static class MainCommand
         getDefaultValue: () => "yaml",
         description: "OpenAPI Spec format (yaml or json)");
 
-    public static async Task InvokeAsync(string[] args)
+    private static Option<string> _outputDirArg = new(
+        aliases: ["--outputDir", "-outDir"],
+        description: "The Output directory");
+
+    public static Command GetCommand()
     {
         _command.AddOption(_fileOption);
         _command.AddOption(_openApiVersionArg);
         _command.AddOption(_openApiFormatArg);
+        _command.AddOption(_outputDirArg);
         
-        _command.SetHandler(Run, _fileOption, _openApiVersionArg, _openApiFormatArg);
-        
-        _command.AddCommand(SplitCommand.GetCommand());
+        _command.SetHandler(Run, _fileOption, _openApiVersionArg, _openApiFormatArg, _outputDirArg);
 
-        await _command.InvokeAsync(args);
+        return _command;
     }
 
-    public static void Run(FileInfo file, string version, string format)
+    public static void Run(FileInfo file, string version, string format, string outputDir)
     {
         if (file is null)
         {
@@ -79,10 +83,10 @@ public static class MainCommand
             Console.WriteLine("Error: OpenApiSpec format is not valid!");
             return;
         }
-
+        
         var parser = new OpenAPISpecParser(
             file.FullName, spec_version, spec_format, true, true);
-
+        
         var parse_result = parser.Load();
         if (parse_result.HasErrors)
         {
@@ -92,13 +96,7 @@ public static class MainCommand
             return;
         }
 
-        var stats = parser.GetStats();
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine($"File: {file.FullName}");
-        Console.WriteLine("Status: ✅ OK");
-        Console.ResetColor();
-        Console.WriteLine();
-        
-        stats.WriteToConsole();
+        parser.SplitToExternalFiles(outputDir);
+        Console.WriteLine($"Split took : {parser.SplitTime} ms");
     }
 }

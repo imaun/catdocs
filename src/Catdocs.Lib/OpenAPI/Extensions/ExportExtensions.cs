@@ -225,47 +225,47 @@ public static class ExportExtensions
 
     private static string GetOpenApiElementTypeName(Type type)
     {
-        if (type is OpenApiSchema)
+        if (type == typeof(OpenApiSchema))
         {
             return OpenApiConstants.Schema;
         }
 
-        if (type is OpenApiParameter)
+        if (type == typeof(OpenApiParameter))
         {
             return OpenApiConstants.Parameter;
         }
 
-        if (type is OpenApiExample)
+        if (type == typeof(OpenApiExample))
         {
             return OpenApiConstants.Example;
         }
 
-        if (type is OpenApiHeader)
+        if (type == typeof(OpenApiHeader))
         {
             return OpenApiConstants.Header;
         }
 
-        if (type is OpenApiResponse)
+        if (type == typeof(OpenApiResponse))
         {
             return OpenApiConstants.Response;
         }
 
-        if (type is OpenApiRequestBody)
+        if (type == typeof(OpenApiRequestBody))
         {
             return OpenApiConstants.RequestBody;
         }
 
-        if (type is OpenApiLink)
+        if (type == typeof(OpenApiLink))
         {
             return OpenApiConstants.Link;
         }
 
-        if (type is OpenApiCallback)
+        if (type == typeof(OpenApiCallback))
         {
             return OpenApiConstants.Callback;
         }
 
-        if (type is OpenApiSecurityScheme)
+        if (type == typeof(OpenApiSecurityScheme))
         {
             return OpenApiConstants.SecurityScheme;
         }
@@ -294,47 +294,47 @@ public static class ExportExtensions
 
     private static string GetOpenApiElementDirectoryName(Type type)
     {
-        if (type is OpenApiSchema)
+        if (type == typeof(OpenApiSchema))
         {
             return OpenApiConstants.Schema_Dir;
         }
 
-        if (type is OpenApiParameter)
+        if (type == typeof(OpenApiParameter))
         {
             return OpenApiConstants.Parameter_Dir;
         }
 
-        if (type is OpenApiExample)
+        if (type == typeof(OpenApiExample))
         {
             return OpenApiConstants.Example_Dir;
         }
 
-        if (type is OpenApiHeader)
+        if (type == typeof(OpenApiHeader))
         {
             return OpenApiConstants.Header_Dir;
         }
 
-        if (type is OpenApiResponse)
+        if (type == typeof(OpenApiResponse))
         {
             return OpenApiConstants.Response_Dir;
         }
 
-        if (type is OpenApiRequestBody)
+        if (type == typeof(OpenApiRequestBody))
         {
             return OpenApiConstants.RequestBody_Dir;
         }
 
-        if (type is OpenApiLink)
+        if (type == typeof(OpenApiLink))
         {
             return OpenApiConstants.Link_Dir;
         }
 
-        if (type is OpenApiCallback)
+        if (type == typeof(OpenApiCallback))
         {
             return OpenApiConstants.Callback_Dir;
         }
 
-        if (type is OpenApiSecurityScheme)
+        if (type == typeof(OpenApiSecurityScheme))
         {
             return OpenApiConstants.SecurityScheme_Dir;
         }
