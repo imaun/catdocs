@@ -48,7 +48,7 @@ internal class OpenApiDocSplitter
         {
             var filename = Path.Combine(
                 paths_dir,
-                $"{GetNormalizedPathFilename(path.Key)}.{_format.GetFormatFileExtension()}");
+                $"{GetNormalizedOpenApiPathFilename(path.Key)}.{_format.GetFormatFileExtension()}");
 
             try
             {
@@ -61,7 +61,7 @@ internal class OpenApiDocSplitter
                     {
                         Id = path.Key,
                         Type = OpenApiConstants.Path.GetOpenApiReferenceType(),
-                        ExternalResource = filename
+                        ExternalResource = GetRelativePath(filename)
                     }
                 });
             }
@@ -221,7 +221,7 @@ internal class OpenApiDocSplitter
     }
     
     
-    private static string GetNormalizedPathFilename(string path)
+    private static string GetNormalizedOpenApiPathFilename(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
         {
