@@ -255,7 +255,7 @@ internal class OpenApiDocSplitter
         stream_writer.Close();
     }
 
-    private string GetRelativePath(string filename)
+    internal string GetRelativePath(string filename)
     {
         var fullFilePath = Path.GetFullPath(filename);
         var fullBasePath = Path.GetFullPath(_outputDir);
