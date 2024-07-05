@@ -7,8 +7,7 @@ public class OpenApiDocSplitterTests
 {
     
     [Theory]
-    [InlineData(@"C:\example\output\paths\get_by_id.yaml", @"C:\example\output", @"paths\get_by_id.yaml")]
-    [InlineData("~/example/output/paths/get_by_id.yaml", "~/example/output", @"paths\get_by_id.yaml")]
+    [MemberData(nameof(OpenApiTestDataProvider.GetRelativePathTestData), MemberType = typeof(OpenApiTestDataProvider))]
     public void GetRelativePath_Should_Return_Correct_RelativePath(
         string inputFilePath, string outputDir, string expectedRelativePath)
     {
