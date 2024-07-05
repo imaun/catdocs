@@ -21,7 +21,7 @@ public static class OpenApiTestDataProvider
         {
             data.Add("~/example/output/paths/get_by_id.yaml", "~/example/output", "paths/get_by_id.yaml");
             data.Add("~/example/main/responses/result_model.json", "~/example/main", "responses/result_model.json");
-            data.Add("~/example/main/requestbodies/req_model.json", "~/example/main", "requestbdoies/req_model.json");
+            data.Add("~/example/main/requestbodies/req_model.json", "~/example/main", "requestbodies/req_model.json");
         }
 
         return data;
