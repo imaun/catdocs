@@ -254,4 +254,18 @@ internal class OpenApiDocSplitter
         stream_writer.Flush();
         stream_writer.Close();
     }
+
+    private string GetRelativePath(string filename)
+    {
+        var fullFilePath = Path.GetFullPath(filename);
+        var fullBasePath = Path.GetFullPath(_outputDir);
+
+        var filePathUri = new Uri(fullFilePath);
+        var basePathUri = new Uri(fullBasePath + Path.DirectorySeparatorChar);
+
+        var relativeUri = basePathUri.MakeRelativeUri(filePathUri);
+
+        var result = Uri.UnescapeDataString(relativeUri.ToString().Replace('/', Path.DirectorySeparatorChar));
+        return result;
+    }
 }

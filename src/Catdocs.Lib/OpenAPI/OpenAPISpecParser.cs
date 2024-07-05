@@ -151,7 +151,7 @@ public class OpenAPISpecParser
         _splitTime = stop_watch.ElapsedMilliseconds;
         SpecLogger.Log($"Split completed in : {_splitTime} ms");
     }
-
+    
     private static void CreateDirIfNotExists(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
