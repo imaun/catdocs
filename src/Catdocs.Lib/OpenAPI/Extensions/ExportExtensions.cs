@@ -171,20 +171,40 @@ public static class ExportExtensions
         return new StreamReader(stream).ReadToEnd();
     }
 
-    public static void SaveDocumentToFile(this OpenApiDocument document, OpenApiFormat format, string filename)
+    public static void SaveDocumentToFile(
+        this OpenApiDocument document, OpenApiSpecVersion version, OpenApiFormat format, string filename)
     {
         using var stream = new FileStream(filename, FileMode.Create);
         if (format is OpenApiFormat.Yaml)
         {
             var yamlWriter = new OpenApiYamlWriter(new StreamWriter(stream));
-            document.SerializeAsV3(yamlWriter);
+            if (version is OpenApiSpecVersion.OpenApi3_0)
+            {
+                document.SerializeAsV3(yamlWriter);    
+            }
+            else
+            {
+                document.SerializeAsV2(yamlWriter);
+            }
             yamlWriter.Flush();
         }
-        else
+        else if(format is OpenApiFormat.Json)
         {
             var jsonWriter = new OpenApiJsonWriter(new StreamWriter(stream));
-            document.SerializeAsV3(jsonWriter);
+            if (version is OpenApiSpecVersion.OpenApi3_0)
+            {
+                document.SerializeAsV3(jsonWriter);    
+            }
+            else
+            {
+                document.SerializeAsV2(jsonWriter);
+            }
             jsonWriter.Flush();
+        }
+        //NOT SUPPORTED!
+        else
+        {
+            SpecLogger.Log("NOT SUPPORTED DOCUMENT FORMAT!");
         }
     }
 

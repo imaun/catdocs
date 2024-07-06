@@ -82,7 +82,7 @@ internal class OpenApiDocSplitter
         var documentFilename = $"{_outputDir}{Path.DirectorySeparatorChar}OpenApi.{_format.GetFormatFileExtension()}";
         //var documentContent = _document.SerializeDocument(_version, _format);
         //SaveToFile(documentFilename, documentContent);
-        _document.SaveDocumentToFile(_format, documentFilename);
+        _document.SaveDocumentToFile(_version, _format, documentFilename);
         SpecLogger.Log($"Main document created at : {documentFilename}");
         
     }
