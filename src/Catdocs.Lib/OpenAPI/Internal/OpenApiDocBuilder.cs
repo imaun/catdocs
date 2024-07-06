@@ -5,17 +5,16 @@ namespace Catdocs.Lib.OpenAPI.Internal;
 
 internal class OpenApiDocBuilder
 {
-    private string _inputPath;
-    private string _documentFilename;
+    private readonly OpenApiDocument _document;
     private OpenApiFormat _format;
     private OpenApiSpecVersion _version;
-    private readonly OpenApiDocument _document;
     private string _inputDir;
 
 
-    public OpenApiDocBuilder(string inputPath)
+    public OpenApiDocBuilder(OpenApiDocument document)
     {
-        _documentFilename = GetDocumentFilenameFromPath(inputPath);
+        ArgumentNullException.ThrowIfNull(document);
+        
         
     }
 

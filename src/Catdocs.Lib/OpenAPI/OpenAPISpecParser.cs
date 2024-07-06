@@ -45,8 +45,6 @@ public class OpenAPISpecParser
         _format = format;
         _inlineLocal = inlineLocal;
         _inlineExternal = inlineExternal;
-        
-        
     }
 
     public OpenApiDocument Document => _document ?? throw new NullReferenceException(nameof(Document));
@@ -64,8 +62,10 @@ public class OpenAPISpecParser
         var stop_watch = new Stopwatch();
         stop_watch.Start();
 
+        var reader = new OpenApiStreamReader();
         using var file_stream = new FileStream(_inputFile, FileMode.Open);
-        _document = new OpenApiStreamReader().Read(file_stream, out var diagnostics);
+        _document = reader.Read(file_stream, out var diagnostics);
+        
         stop_watch.Stop();
         _parseTime = stop_watch.ElapsedMilliseconds;
         SpecLogger.Log($"Document parsed in : {_parseTime} ms");
