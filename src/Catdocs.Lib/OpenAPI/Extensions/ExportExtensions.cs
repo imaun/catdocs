@@ -148,8 +148,8 @@ public static class ExportExtensions
         using var stream = new MemoryStream();
         element.Serialize(stream, version, format, new OpenApiWriterSettings
         {
-            InlineLocalReferences = true,
-            InlineExternalReferences = false
+            InlineLocalReferences = false,
+            InlineExternalReferences = true
         });
         stream.Position = 0;
         
@@ -163,12 +163,27 @@ public static class ExportExtensions
         using var stream = new MemoryStream();
         document.Serialize(stream, version, format, new OpenApiWriterSettings
         {
-            InlineLocalReferences = false,
+            InlineLocalReferences = true,
             InlineExternalReferences = true
         });
         stream.Position = 0;
 
         return new StreamReader(stream).ReadToEnd();
+    }
+
+    public static void SaveDocumentToFile(this OpenApiDocument document, OpenApiFormat format, string filename)
+    {
+        using var stream = new FileStream(filename, FileMode.Create);
+        if (format is OpenApiFormat.Yaml)
+        {
+            var yamlWriter = new OpenApiYamlWriter(new StreamWriter(stream));
+            document.SerializeAsV3(yamlWriter);
+        }
+        else
+        {
+            var jsonWriter = new OpenApiJsonWriter(new StreamWriter(stream));
+            document.SerializeAsV3(jsonWriter);
+        }
     }
 
     

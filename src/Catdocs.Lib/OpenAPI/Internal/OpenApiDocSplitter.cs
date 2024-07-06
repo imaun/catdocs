@@ -77,12 +77,14 @@ internal class OpenApiDocSplitter
         
         SpecLogger.Log("Export API Paths finished.");
         
+        ExportComponents();
+        
         var documentFilename = $"{_outputDir}{Path.DirectorySeparatorChar}OpenApi{_format.GetFormatFileExtension()}";
-        var documentContent = _document.SerializeDocument(_version, _format);
-        SaveToFile(documentFilename, documentContent);
+        //var documentContent = _document.SerializeDocument(_version, _format);
+        //SaveToFile(documentFilename, documentContent);
+        _document.SaveDocumentToFile(_format, documentFilename);
         SpecLogger.Log($"Main document created at : {documentFilename}");
         
-        ExportComponents();
     }
     
     private void ExportComponents()
@@ -205,7 +207,7 @@ internal class OpenApiDocSplitter
                 var content = el.Value.SerializeElement(_version, _format);
                 SaveToFile(filename, content);
                 
-                _document.Components.AddExternalReferenceFor(elementTypeName, el.Key, filename);
+                //_document.Components.AddExternalReferenceFor(elementTypeName, el.Key, filename);
             }
             catch (Exception ex)
             {
@@ -265,7 +267,8 @@ internal class OpenApiDocSplitter
 
         var relativeUri = basePathUri.MakeRelativeUri(filePathUri);
 
-        var result = Uri.UnescapeDataString(relativeUri.ToString().Replace('/', Path.DirectorySeparatorChar));
+        // var result = Uri.UnescapeDataString(relativeUri.ToString().Replace('/', Path.DirectorySeparatorChar));
+        var result = Uri.UnescapeDataString(relativeUri.ToString());
         return result;
     }
 }
