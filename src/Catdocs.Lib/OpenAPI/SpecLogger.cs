@@ -30,6 +30,16 @@ public static class SpecLogger
         Log(sb.ToString());
     }
 
+    public static void LogError(string error)
+    {
+        Log($"ERROR: {error}");
+    }
+
+    public static void LogWarning(string warning)
+    {
+        Log($"WARNING: {warning}");
+    }
+
     public static void Log(string log)
     {
         if (string.IsNullOrWhiteSpace(log))
