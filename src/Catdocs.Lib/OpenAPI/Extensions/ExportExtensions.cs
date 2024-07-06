@@ -178,11 +178,13 @@ public static class ExportExtensions
         {
             var yamlWriter = new OpenApiYamlWriter(new StreamWriter(stream));
             document.SerializeAsV3(yamlWriter);
+            yamlWriter.Flush();
         }
         else
         {
             var jsonWriter = new OpenApiJsonWriter(new StreamWriter(stream));
             document.SerializeAsV3(jsonWriter);
+            jsonWriter.Flush();
         }
     }
 
