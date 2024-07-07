@@ -208,6 +208,33 @@ public static class ExportExtensions
         }
     }
 
+    public static IEnumerable<KeyValuePair<string, T>> GetComponentsWithType<T>(
+        this OpenApiDocument document, string elementType) where T : IOpenApiReferenceable
+    {
+        switch (elementType)
+        {
+            case OpenApiConstants.Schema:
+                return document.Components.Schemas.Cast<KeyValuePair<string, T>>();
+            case OpenApiConstants.Callback:
+                return document.Components.Callbacks.Cast<KeyValuePair<string, T>>();
+            case OpenApiConstants.Parameter:
+                return document.Components.Parameters.Cast<KeyValuePair<string, T>>();
+            case OpenApiConstants.Example:
+                return document.Components.Examples.Cast<KeyValuePair<string, T>>();
+            case OpenApiConstants.Header:
+                return document.Components.Headers.Cast<KeyValuePair<string, T>>();
+            case OpenApiConstants.Link:
+                return document.Components.Links.Cast<KeyValuePair<string, T>>();
+            case OpenApiConstants.Response:
+                return document.Components.Responses.Cast<KeyValuePair<string, T>>();
+            case OpenApiConstants.RequestBody:
+                return document.Components.RequestBodies.Cast<KeyValuePair<string, T>>();
+            
+            default:
+                throw new ArgumentException($"OpenAPI type `{elementType}` not supported!");
+        }
+    }
+
     
     public static void DeleteAllElementsOfType(this OpenApiComponents components, string elementTypeName)
     {
