@@ -23,9 +23,60 @@ internal class OpenApiDocBuilder
     }
 
 
-
-    internal Dictionary<string, T> ResolveReferences<T>(string elementType) where T: IOpenApiReferenceable
+    public OpenApiDocument Build()
     {
+        var api_paths = new OpenApiPaths();
+        foreach (var path in _document.Paths)
+        {
+            if (path.Value.Reference is not null)
+            {
+                var pathRef = path.Value.Reference.ExternalResource;
+                var pathDoc = LoadApiPathDocument(Path.Combine(_inputDir, pathRef));
+                foreach (var resolvedPath in pathDoc.Paths)
+                {
+                    api_paths.Add(resolvedPath.Key, resolvedPath.Value);
+                }
+            }
+            else
+            {
+                api_paths.Add(path.Key, path.Value);
+            }
+        }
+
+        _document.Paths = api_paths;
+        
+        var resolvedComponents = new OpenApiComponents();
+        resolvedComponents.Schemas = ResolveReferences<OpenApiSchema>();
+        resolvedComponents.Callbacks = ResolveReferences<OpenApiCallback>();
+        resolvedComponents.Examples = ResolveReferences<OpenApiExample>();
+        resolvedComponents.Parameters = ResolveReferences<OpenApiParameter>();
+        resolvedComponents.Headers = ResolveReferences<OpenApiHeader>();
+        resolvedComponents.Responses = ResolveReferences<OpenApiResponse>();
+        resolvedComponents.RequestBodies = ResolveReferences<OpenApiRequestBody>();
+        resolvedComponents.Links = ResolveReferences<OpenApiLink>();
+
+        _document.Components = resolvedComponents;
+
+        return _document;
+    }
+
+
+    internal OpenApiDocument LoadApiPathDocument(string filePath)
+    {
+        var reader = new OpenApiStreamReader();
+        using var file_stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+        var doc = reader.Read(file_stream, out var diagnostic);
+        if (diagnostic is not null)
+        {
+            SpecLogger.LogError(diagnostic.GetErrorLogForElementType(OpenApiConstants.Path, filePath));
+        }
+
+        return doc;
+    }
+
+    internal Dictionary<string, T> ResolveReferences<T>() where T: IOpenApiReferenceable
+    {
+        var elementType = typeof(T).GetOpenApiElementTypeName();
         var result = new Dictionary<string, T>();
         var file_ext = _format.GetFormatFileExtension();
         var element_dir = typeof(T).GetOpenApiElementDirectoryName();
