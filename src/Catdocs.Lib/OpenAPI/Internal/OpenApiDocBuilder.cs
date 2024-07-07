@@ -45,6 +45,11 @@ internal class OpenApiDocBuilder
             {
                 SpecLogger.LogError(diagnostics.GetErrorLogForElementType(elementType, f));
             }
+
+            foreach (var component in componentPart.GetComponentsWithType<T>(elementType))
+            {
+                result.Add(component.Key, component.Value);
+            }
         }
 
         return result;
