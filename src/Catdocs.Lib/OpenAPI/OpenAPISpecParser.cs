@@ -30,17 +30,17 @@ public class OpenAPISpecParser
     }
 
     public OpenAPISpecParser(
-        string inputFile, 
+        string inputPath, 
         OpenApiSpecVersion version = OpenApiSpecVersion.OpenApi3_0,
         OpenApiFormat format = OpenApiFormat.Yaml,
         bool inlineLocal = false,
         bool inlineExternal = false)
     {
-        if (string.IsNullOrWhiteSpace(inputFile))
-            throw new ArgumentNullException(nameof(inputFile));
+        if (string.IsNullOrWhiteSpace(inputPath))
+            throw new ArgumentNullException(nameof(inputPath));
         
-        SpecLogger.SetLogFilename(inputFile);
-        _inputFile = inputFile;
+        SpecLogger.SetLogFilename(inputPath);
+        _inputFile = GetDocumentFilenameFromPath(inputPath);
         _version = version;
         _format = format;
         _inlineLocal = inlineLocal;
@@ -163,5 +163,30 @@ public class OpenAPISpecParser
         {
             Directory.CreateDirectory(path);
         }
+    }
+    
+    internal string GetDocumentFilenameFromPath(string inputPath)
+    {
+        if (File.Exists(inputPath))
+        {
+            return inputPath;
+        }
+
+        if (Directory.Exists(inputPath))
+        {
+            var file = Directory
+                .EnumerateFiles(inputPath, "*.*", SearchOption.TopDirectoryOnly)
+                .FirstOrDefault(f => f.EndsWith(".json", StringComparison.OrdinalIgnoreCase) ||
+                                     f.EndsWith(".yaml", StringComparison.OrdinalIgnoreCase));
+
+            if (file is not null)
+            {
+                return file;
+            }
+        }
+        
+        string err = $"No OpenAPI files found in: {inputPath}";
+        SpecLogger.LogError(err);
+        throw new FileNotFoundException(err); 
     }
 }
