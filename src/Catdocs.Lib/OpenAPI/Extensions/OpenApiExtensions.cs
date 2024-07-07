@@ -1,6 +1,8 @@
 ﻿using System.Reflection.Metadata;
+using System.Text;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi.Readers;
 
 namespace Catdocs.Lib.OpenAPI;
 
@@ -103,5 +105,22 @@ public static class OpenApiExtensions
         Console.ForegroundColor = ConsoleColor.Magenta;
         Console.WriteLine(stats);
         Console.ResetColor();
+    }
+
+    public static string GetErrorLogForElementType(
+        this OpenApiDiagnostic diagnostics, string elementType, string filename = "")
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine($"Read type: {elementType} " + filename != string.Empty ? $"from file {filename}" : "");
+        if (diagnostics.Errors.Any())
+        {
+            sb.AppendLine("Errors: ");
+            foreach (var err in diagnostics.Errors)
+            {
+                sb.AppendLine($"     - {err}");
+            }
+        }
+
+        return sb.ToString();
     }
 }

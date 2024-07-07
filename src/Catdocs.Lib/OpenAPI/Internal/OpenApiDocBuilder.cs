@@ -1,6 +1,7 @@
 ﻿using Microsoft.OpenApi;
 using Microsoft.OpenApi.Interfaces;
 using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi.Readers;
 
 namespace Catdocs.Lib.OpenAPI.Internal;
 
@@ -37,7 +38,15 @@ internal class OpenApiDocBuilder
 
         foreach (var f in files)
         {
-            
+            var reader = new OpenApiStreamReader();
+            using var file_stream = new FileStream(f, FileMode.Open, FileAccess.Read);
+            var componentPart = reader.Read(file_stream, out var diagnostics);
+            if (diagnostics is not null)
+            {
+                SpecLogger.LogError(diagnostics.GetErrorLogForElementType(elementType, f));
+            }
         }
+
+        return result;
     }
 }
