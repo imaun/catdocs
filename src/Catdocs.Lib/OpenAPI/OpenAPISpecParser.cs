@@ -21,6 +21,7 @@ public class OpenAPISpecParser
     private bool _inlineLocal;
     private bool _inlineExternal;
     private long _splitTime;
+    private long _buildTime;
 
     private void AddError(string error)
     {
@@ -151,6 +152,29 @@ public class OpenAPISpecParser
         _splitTime = stop_watch.ElapsedMilliseconds;
         SpecLogger.Log($"Split completed in : {_splitTime} ms");
     }
+
+
+    public void Build(string newDocumentFilename)
+    {
+        if (string.IsNullOrWhiteSpace(newDocumentFilename))
+        {
+            throw new ArgumentNullException(nameof(newDocumentFilename));
+        }
+
+        var stop_watch = new Stopwatch();
+        stop_watch.Start();
+
+        var inputDir = GetDirectoryForFilename(_inputFile);
+
+        var builder = new OpenApiDocBuilder(inputDir, _document, _version, _format);
+        var new_document = builder.Build();
+        
+        new_document.SaveDocumentToFile(_version, _format, newDocumentFilename);
+        
+        stop_watch.Stop();
+        _buildTime = stop_watch.ElapsedMilliseconds;
+        SpecLogger.Log($"Build completed in : {_buildTime} ms");
+    }
     
     private static void CreateDirIfNotExists(string path)
     {
@@ -163,6 +187,12 @@ public class OpenAPISpecParser
         {
             Directory.CreateDirectory(path);
         }
+    }
+
+    internal string GetDirectoryForFilename(string filename)
+    {
+        var fileInfo = new FileInfo(filename);
+        return fileInfo.DirectoryName;
     }
     
     internal string GetDocumentFilenameFromPath(string inputPath)
