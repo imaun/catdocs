@@ -45,15 +45,17 @@ internal class OpenApiDocBuilder
 
         _document.Paths = api_paths;
         
-        var resolvedComponents = new OpenApiComponents();
-        resolvedComponents.Schemas = ResolveReferences<OpenApiSchema>();
-        resolvedComponents.Callbacks = ResolveReferences<OpenApiCallback>();
-        resolvedComponents.Examples = ResolveReferences<OpenApiExample>();
-        resolvedComponents.Parameters = ResolveReferences<OpenApiParameter>();
-        resolvedComponents.Headers = ResolveReferences<OpenApiHeader>();
-        resolvedComponents.Responses = ResolveReferences<OpenApiResponse>();
-        resolvedComponents.RequestBodies = ResolveReferences<OpenApiRequestBody>();
-        resolvedComponents.Links = ResolveReferences<OpenApiLink>();
+        var resolvedComponents = new OpenApiComponents
+        {
+            Schemas = ResolveReferences<OpenApiSchema>(),
+            Callbacks = ResolveReferences<OpenApiCallback>(),
+            Examples = ResolveReferences<OpenApiExample>(),
+            Parameters = ResolveReferences<OpenApiParameter>(),
+            Headers = ResolveReferences<OpenApiHeader>(),
+            Responses = ResolveReferences<OpenApiResponse>(),
+            RequestBodies = ResolveReferences<OpenApiRequestBody>(),
+            Links = ResolveReferences<OpenApiLink>()
+        };
 
         _document.Components = resolvedComponents;
 
