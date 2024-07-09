@@ -1,4 +1,6 @@
 ﻿using System.CommandLine;
+using Catdocs.Lib.OpenAPI;
+using Microsoft.OpenApi;
 
 namespace Catdocs.Commands;
 
@@ -22,8 +24,68 @@ public static class BuildCommand
         description: "OpenAPI Spec format (yaml or json)");
 
     private static Option<string> _outputDirArg = new(
-        aliases: ["--outputDir", "-outDir"],
-        description: "The Output directory");
-    
-    
+        aliases: ["--output", "-out"],
+        description: "The Output file");
+
+
+    public static void Run(FileInfo file, string version, string format, string outputFile)
+    {
+        if (file is null)
+        {
+            Console.WriteLine("Error: Filename is not valid!");
+            return;
+        }
+        
+        if (!file.Exists)
+        {
+            Console.WriteLine($"Error: File '{file.Name}' not found!");
+            return;
+        }
+        
+        var spec_version = OpenApiSpecVersion.OpenApi3_0;
+        var spec_format = OpenApiFormat.Yaml;
+        
+        if (version == "2.0" || version == "2")
+        {
+            spec_version = OpenApiSpecVersion.OpenApi2_0;
+        }
+        else if (version == "3.0" || version == "3")
+        {
+            spec_version = OpenApiSpecVersion.OpenApi3_0;
+        }
+        else
+        {
+            Console.WriteLine("Error: OpenApiSpec Version is not valid!");
+            return;
+        }
+        
+        if (format.ToLower() == "json")
+        {
+            spec_format = OpenApiFormat.Json;
+        }
+        else if (format.ToLower() == "yaml")
+        {
+            spec_format = OpenApiFormat.Yaml;
+        }
+        else
+        {
+            Console.WriteLine("Error: OpenApiSpec format is not valid!");
+            return;
+        }
+        
+        var parser = new OpenAPISpecParser(
+            file.FullName, spec_version, spec_format, true, true);
+        
+        var parse_result = parser.Load();
+        if (parse_result.HasErrors)
+        {
+            ConsoleExtensions.WriteErrorLine("🩻 Found some errors: ");
+            parse_result.Errors.WriteListToConsole(useLineNo: true, useTab: true, color: ConsoleColor.Red);
+            
+            return;
+        }
+        
+        parser.Build(outputFile);
+        Console.WriteLine($"Build took: {parser.BuildTime} ms");
+    }
 }

@@ -49,8 +49,10 @@ public class OpenAPISpecParser
     }
 
     public OpenApiDocument Document => _document ?? throw new NullReferenceException(nameof(Document));
-    
-    public long SplitTime { get; private set; }
+
+    public long SplitTime => _splitTime;
+
+    public long BuildTime => _buildTime;
     
     public OpenApiSpecInfo Load()
     {
