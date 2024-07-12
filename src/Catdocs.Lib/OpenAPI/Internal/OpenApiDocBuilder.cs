@@ -81,9 +81,9 @@ internal class OpenApiDocBuilder
         var elementType = typeof(T).GetOpenApiElementTypeName();
         var result = new Dictionary<string, T>();
         var file_ext = _format.GetFormatFileExtension();
-        var element_dir = typeof(T).GetOpenApiElementDirectoryName();
+        var element_dir = Path.Combine(_inputDir, typeof(T).GetOpenApiElementDirectoryName());
 
-        var files = Directory.GetFiles(_inputDir, $"*.{file_ext}");
+        var files = Directory.GetFiles(element_dir, $"*.{file_ext}");
         if (!files.Any())
         {
             return result;

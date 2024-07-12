@@ -193,7 +193,12 @@ internal class OpenApiDocSplitter
         CreateDirIfNotExists(dir);
         
         //Keep a clone of the current elements in the document
-        IDictionary<string, T> elementsClone = elements;
+        IDictionary<string, T> elementsClone = new Dictionary<string, T>();
+        foreach (var el in elements)
+        {
+            elementsClone.Add(el.Key, el.Value);
+        }
+        
         _document.Components.DeleteAllElementsOfType(elementTypeName);
         
         foreach (var el in elementsClone)

@@ -1,4 +1,5 @@
-﻿using Microsoft.OpenApi;
+﻿using System.Text;
+using Microsoft.OpenApi;
 using Microsoft.OpenApi.Extensions;
 using Microsoft.OpenApi.Interfaces;
 using Microsoft.OpenApi.Models;
@@ -143,14 +144,19 @@ public static class ExportExtensions
 
 
     public static string SerializeElement<T>(
-        this T element, OpenApiSpecVersion version, OpenApiFormat format) where T: IOpenApiReferenceable
+        this T element, OpenApiSpecVersion version, OpenApiFormat format) where T: IOpenApiSerializable
     {
         using var stream = new MemoryStream();
-        element.Serialize(stream, version, format, new OpenApiWriterSettings
+        if (format is OpenApiFormat.Json)
         {
-            InlineLocalReferences = false,
-            InlineExternalReferences = true
-        });
+            var jsonWriter = new OpenApiJsonWriter(new StreamWriter(stream, Encoding.UTF8));
+            element.Serialize(jsonWriter, version);
+        }
+        else
+        {
+            var yamlWriter = new OpenApiYamlWriter(new StreamWriter(stream, Encoding.UTF8));
+            element.Serialize(yamlWriter, version);
+        }
         stream.Position = 0;
         
         return new StreamReader(stream).ReadToEnd();
