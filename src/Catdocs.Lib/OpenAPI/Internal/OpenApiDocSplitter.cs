@@ -192,23 +192,57 @@ internal class OpenApiDocSplitter
         
         CreateDirIfNotExists(dir);
         
-        //Keep a clone of the current elements in the document
-        IDictionary<string, T> elementsClone = new Dictionary<string, T>();
         foreach (var el in elements)
         {
-            elementsClone.Add(el.Key, el.Value);
-        }
-        
-        _document.Components.DeleteAllElementsOfType(elementTypeName);
-        
-        foreach (var el in elementsClone)
-        {
             var filename = Path.Combine(dir, $"{el.Key}.{_format.GetFormatFileExtension()}");
+            
             try
             {
-                var content = el.Value.SerializeElement(_version, _format);
-                SaveToFile(filename, content);
+                var temp_document = new OpenApiDocument
+                {
+                    Components = new OpenApiComponents()
+                };
+
+                switch (elementTypeName)
+                {
+                    case OpenApiConstants.Schema:
+                        temp_document.Components.Schemas.Add(el.Key, el.Value as OpenApiSchema);
+                        break;
+                    
+                    case OpenApiConstants.Example:
+                        temp_document.Components.Examples.Add(el.Key, el.Value as OpenApiExample);
+                        break;
+                    
+                    case OpenApiConstants.Callback:
+                        temp_document.Components.Callbacks.Add(el.Key, el.Value as OpenApiCallback);
+                        break;
+                    
+                    case OpenApiConstants.Header:
+                        temp_document.Components.Headers.Add(el.Key, el.Value as OpenApiHeader);
+                        break;
+                    
+                    case OpenApiConstants.Link:
+                        temp_document.Components.Links.Add(el.Key, el.Value as OpenApiLink);
+                        break;
+                    
+                    case OpenApiConstants.Response:
+                        temp_document.Components.Responses.Add(el.Key, el.Value as OpenApiResponse);
+                        break;
+                    
+                    case OpenApiConstants.RequestBody:
+                        temp_document.Components.RequestBodies.Add(el.Key, el.Value as OpenApiRequestBody);
+                        break;
+                    
+                    case OpenApiConstants.Parameter:
+                        temp_document.Components.Parameters.Add(el.Key, el.Value as OpenApiParameter);
+                        break;
+                }
+
+                temp_document.SaveDocumentToFile(_version, _format, filename);
                 
+                //var content = el.Value.SerializeElement(_version, _format);
+                //SaveToFile(filename, content);
+
                 //_document.Components.AddExternalReferenceFor(elementTypeName, el.Key, filename);
             }
             catch (Exception ex)
@@ -221,8 +255,13 @@ internal class OpenApiDocSplitter
             }
         }
         
+        _document.Components.DeleteAllElementsOfType(elementTypeName);
+        
         SpecLogger.Log($"Export {elementTypeName} finished.");
     }
+
+
+    
     
     
     private static string GetNormalizedOpenApiPathFilename(string path)

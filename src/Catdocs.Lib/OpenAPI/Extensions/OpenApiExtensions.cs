@@ -1,8 +1,11 @@
 ﻿using System.Reflection.Metadata;
 using System.Text;
 using Microsoft.OpenApi;
+using Microsoft.OpenApi.Extensions;
+using Microsoft.OpenApi.Interfaces;
 using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Readers;
+using Microsoft.OpenApi.Writers;
 
 namespace Catdocs.Lib.OpenAPI;
 
@@ -122,5 +125,50 @@ public static class OpenApiExtensions
         }
 
         return sb.ToString();
+    }
+    
+    public static T CreateCopyOfElement<T>(this T element, string elementTypeName, OpenApiFormat format, OpenApiSpecVersion version) 
+        where T : IOpenApiReferenceable
+    {
+        using var stream = new MemoryStream();
+
+        using var streamWriter = new StreamWriter(stream, Encoding.UTF8);
+        if (format is OpenApiFormat.Json)
+        {
+            var jsonWriter = new OpenApiJsonWriter(streamWriter);
+            if (version is OpenApiSpecVersion.OpenApi3_0)
+            {
+                element.SerializeAsV3(jsonWriter);
+            }
+            else
+            {
+                element.SerializeAsV2(jsonWriter);
+            }
+        }
+        else
+        {
+            var yamlWriter = new OpenApiJsonWriter(streamWriter);
+            if (version is OpenApiSpecVersion.OpenApi3_0)
+            {
+                element.SerializeAsV3(yamlWriter);
+            }
+            else
+            {
+                element.SerializeAsV2(yamlWriter);
+            }
+        }
+        streamWriter.Flush();
+
+        stream.Position = 0;
+        
+        var reader = new OpenApiStreamReader();
+        var copy = reader.ReadFragment<T>(stream, version, out var diagnostic);
+
+        if (diagnostic.Errors.Any())
+        {
+            SpecLogger.LogError($"Cannot create deep copy of element of type: {elementTypeName}!");
+        }
+
+        return copy;
     }
 }
