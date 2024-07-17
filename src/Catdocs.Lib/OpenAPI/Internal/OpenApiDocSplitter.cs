@@ -52,8 +52,16 @@ internal class OpenApiDocSplitter
 
             try
             {
-                var content = path.Value.SerializeElement(_version, _format);
-                SaveToFile(filename, content);
+                var temp_document = new OpenApiDocument
+                {
+                    Paths = new OpenApiPaths()
+                };
+                
+                temp_document.Paths.Add(path.Key, path.Value);
+                temp_document.SaveDocumentToFile(_version, _format, filename);
+                
+                // var content = path.Value.SerializeElement(_version, _format);
+                // SaveToFile(filename, content);
                 
                 _document.Paths.Add(path.Key, new OpenApiPathItem
                 {

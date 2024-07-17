@@ -36,10 +36,11 @@ internal class OpenApiDocBuilder
             if (path.Value.Reference is not null)
             {
                 var pathRef = path.Value.Reference.ExternalResource;
-                var pathDoc = LoadApiPathDocument(Path.Combine(_inputDir, pathRef));
+                var filePath = Path.Combine(_inputDir, pathRef);
+                var pathDoc = LoadApiPathDocument(Path.GetFullPath(filePath));
                 foreach (var resolvedPath in pathDoc.Paths)
                 {
-                    api_paths.Add(resolvedPath.Key, resolvedPath.Value);
+                    api_paths.Add(resolvedPath.Key, resolvedPath.Value as OpenApiPathItem);
                 }
             }
             else
@@ -70,13 +71,17 @@ internal class OpenApiDocBuilder
 
     internal OpenApiDocument LoadApiPathDocument(string filePath)
     {
-        var reader = new OpenApiStreamReader();
+        var reader = new OpenApiStreamReader(new OpenApiReaderSettings
+        {
+            ReferenceResolution = ReferenceResolutionSetting.DoNotResolveReferences
+        });
+        
         using var file_stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
         var doc = reader.Read(file_stream, out var diagnostic);
-        if (diagnostic is not null)
-        {
-            SpecLogger.LogError(diagnostic.GetErrorLogForElementType(OpenApiConstants.Path, filePath));
-        }
+        // if (diagnostic is not null)
+        // {
+        //     SpecLogger.LogError(diagnostic.GetErrorLogForElementType(OpenApiConstants.Path, filePath));
+        // }
 
         return doc;
     }
@@ -88,6 +93,11 @@ internal class OpenApiDocBuilder
         var file_ext = _format.GetFormatFileExtension();
         var element_dir = Path.Combine(_inputDir, typeof(T).GetOpenApiElementDirectoryName());
 
+        if (!Directory.Exists(element_dir))
+        {
+            return result;
+        }
+        
         var files = Directory.GetFiles(element_dir, $"*.{file_ext}");
         if (!files.Any())
         {
@@ -96,13 +106,17 @@ internal class OpenApiDocBuilder
 
         foreach (var f in files)
         {
-            var reader = new OpenApiStreamReader();
+            var reader = new OpenApiStreamReader(new OpenApiReaderSettings
+            {
+                ReferenceResolution = ReferenceResolutionSetting.ResolveLocalReferences
+            });
+            
             using var file_stream = new FileStream(f, FileMode.Open, FileAccess.Read);
             var componentPart = reader.Read(file_stream, out var diagnostics);
-            if (diagnostics is not null)
-            {
-                SpecLogger.LogError(diagnostics.GetErrorLogForElementType(elementType, f));
-            }
+            // if (diagnostics is not null)
+            // {
+            //     SpecLogger.LogError(diagnostics.GetErrorLogForElementType(elementType, f));
+            // }
 
             foreach (var component in componentPart.GetComponentsWithType<T>(elementType))
             {
