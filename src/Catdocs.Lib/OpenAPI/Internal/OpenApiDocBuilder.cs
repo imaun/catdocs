@@ -51,7 +51,7 @@ internal class OpenApiDocBuilder
 
         _document.Paths = api_paths;
         
-        var resolvedComponents = new OpenApiComponents
+        _document.Components = new OpenApiComponents
         {
             Schemas = ResolveReferences<OpenApiSchema>(),
             Callbacks = ResolveReferences<OpenApiCallback>(),
@@ -62,8 +62,6 @@ internal class OpenApiDocBuilder
             RequestBodies = ResolveReferences<OpenApiRequestBody>(),
             Links = ResolveReferences<OpenApiLink>()
         };
-
-        _document.Components = resolvedComponents;
 
         return _document;
     }
@@ -108,7 +106,48 @@ internal class OpenApiDocBuilder
         {
             var reader = new OpenApiStreamReader(new OpenApiReaderSettings
             {
-                ReferenceResolution = ReferenceResolutionSetting.ResolveLocalReferences
+                ReferenceResolution = ReferenceResolutionSetting.DoNotResolveReferences
+            });
+            
+            using var file_stream = new FileStream(f, FileMode.Open, FileAccess.Read);
+            var componentPart = reader.Read(file_stream, out var diagnostics);
+            // if (diagnostics is not null)
+            // {
+            //     SpecLogger.LogError(diagnostics.GetErrorLogForElementType(elementType, f));
+            // }
+            
+            foreach (var component in componentPart.GetComponentsWithType<T>(elementType))
+            {
+                result.Add(component.Key, component.Value);
+            }
+        }
+
+        return result;
+    }
+
+
+    internal Dictionary<string, OpenApiSchema> ResolveSchemas()
+    {
+        var result = new Dictionary<string, OpenApiSchema>();
+        var file_ext = _format.GetFormatFileExtension();
+        var element_dir = Path.Combine(_inputDir, OpenApiConstants.Schema_Dir);
+
+        if (!Directory.Exists(element_dir))
+        {
+            return result;
+        }
+        
+        var files = Directory.GetFiles(element_dir, $"*.{file_ext}");
+        if (!files.Any())
+        {
+            return result;
+        }
+
+        foreach (var f in files)
+        {
+            var reader = new OpenApiStreamReader(new OpenApiReaderSettings
+            {
+                ReferenceResolution = ReferenceResolutionSetting.DoNotResolveReferences
             });
             
             using var file_stream = new FileStream(f, FileMode.Open, FileAccess.Read);
@@ -118,9 +157,9 @@ internal class OpenApiDocBuilder
             //     SpecLogger.LogError(diagnostics.GetErrorLogForElementType(elementType, f));
             // }
 
-            foreach (var component in componentPart.GetComponentsWithType<T>(elementType))
+            foreach (var schema in componentPart.Components.Schemas)
             {
-                result.Add(component.Key, component.Value);
+                result.Add(schema.Key, schema.Value);
             }
         }
 
