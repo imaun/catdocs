@@ -260,10 +260,6 @@ internal class OpenApiDocSplitter
         SpecLogger.Log($"Export {elementTypeName} finished.");
     }
 
-
-    
-    
-    
     private static string GetNormalizedOpenApiPathFilename(string path)
     {
         if (string.IsNullOrWhiteSpace(path))

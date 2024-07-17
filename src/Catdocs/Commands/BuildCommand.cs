@@ -28,6 +28,19 @@ public static class BuildCommand
         description: "The Output file");
 
 
+    public static Command GetCommand()
+    {
+        _command.AddOption(_fileOption);
+        _command.AddOption(_openApiVersionArg);
+        _command.AddOption(_openApiFormatArg);
+        _command.AddOption(_outputDirArg);
+        
+        _command.SetHandler(Run, _fileOption, _openApiVersionArg, _openApiFormatArg, _outputDirArg);
+
+        return _command;
+    }
+
+
     public static void Run(FileInfo file, string version, string format, string outputFile)
     {
         if (file is null)

@@ -31,6 +31,7 @@ public static class MainCommand
         _command.SetHandler(Run, _fileOption, _openApiVersionArg, _openApiFormatArg);
         
         _command.AddCommand(SplitCommand.GetCommand());
+        _command.AddCommand(BuildCommand.GetCommand());
 
         await _command.InvokeAsync(args);
     }
