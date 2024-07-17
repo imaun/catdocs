@@ -12,11 +12,16 @@ internal class OpenApiDocBuilder
     private OpenApiSpecVersion _version;
     private string _inputDir;
 
-    public OpenApiDocBuilder(string inputDir, OpenApiDocument document, OpenApiSpecVersion version, OpenApiFormat format)
+    public OpenApiDocBuilder(
+        string inputDir, 
+        OpenApiDocument document, 
+        OpenApiSpecVersion version, 
+        OpenApiFormat format)
     {
         ArgumentNullException.ThrowIfNullOrWhiteSpace(inputDir);
         ArgumentNullException.ThrowIfNull(document);
 
+        _document = document;
         _inputDir = inputDir;
         _version = version;
         _format = format;

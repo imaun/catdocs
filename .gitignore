@@ -401,3 +401,5 @@ FodyWeavers.xsd
 # Custom
 **/sample.json
 **/sample.yaml
+
+**/out/
