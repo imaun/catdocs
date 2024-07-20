@@ -110,7 +110,25 @@ public class OpenAPISpecParser
     public string ToJsonString() => Convert(OpenApiFormat.Json);
 
     public string ToYamlString() => Convert(OpenApiFormat.Yaml);
-    
+
+
+    public void ConvertTo(OpenApiFormat format, string targetFilename)
+    {
+        ArgumentNullException.ThrowIfNullOrWhiteSpace(targetFilename);
+
+        string output = string.Empty;
+
+        if (format is OpenApiFormat.Json)
+        {
+            output = ToJsonString();
+        }
+        else if (format is OpenApiFormat.Yaml)
+        {
+            output = ToYamlString();
+        }
+
+        SaveToFile(filePath: targetFilename, content: output);
+    }
 
     private string Convert(OpenApiFormat format)
     {
@@ -220,5 +238,15 @@ public class OpenAPISpecParser
         string err = $"No OpenAPI files found in: {inputPath}";
         SpecLogger.LogError(err);
         throw new FileNotFoundException(err); 
+    }
+    
+    private static void SaveToFile(string filePath, string content)
+    {
+        var fs = new FileStream(
+            filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+        using var stream_writer = new StreamWriter(fs);
+        stream_writer.Write(content);
+        stream_writer.Flush();
+        stream_writer.Close();
     }
 }

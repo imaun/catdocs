@@ -303,16 +303,6 @@ internal class OpenApiDocSplitter
             Directory.CreateDirectory(path);
         }
     }
-    
-    private static void SaveToFile(string filePath, string content)
-    {
-        var fs = new FileStream(
-            filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
-        using var stream_writer = new StreamWriter(fs);
-        stream_writer.Write(content);
-        stream_writer.Flush();
-        stream_writer.Close();
-    }
 
     internal string GetRelativePath(string filename)
     {
