@@ -30,6 +30,7 @@ public static class OpenApiConstants
     public const string Callback_Dir = "callbacks";
 
     public const string SecurityScheme = "SecurityScheme";
+    public const string SecurityScheme_Dir = "securityschemes";
 
     public const string Tag = "Tag";
     public const string Tag_Dir = "tags";

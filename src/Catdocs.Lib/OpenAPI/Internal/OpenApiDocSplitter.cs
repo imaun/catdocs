@@ -1,4 +1,5 @@
-﻿using Microsoft.OpenApi;
+﻿using LibGit2Sharp;
+using Microsoft.OpenApi;
 using Microsoft.OpenApi.Interfaces;
 using Microsoft.OpenApi.Models;
 
@@ -103,7 +104,7 @@ internal class OpenApiDocSplitter
         ExportRequestBodies();
         ExportLinks();
         ExportExamples();
-        ExportSecuritySchemes();
+        //ExportSecuritySchemes();
     }
 
     private void ExportSchemas()
@@ -255,6 +256,10 @@ internal class OpenApiDocSplitter
                     
                     case OpenApiConstants.Parameter:
                         temp_document.Components.Parameters.Add(el.Key, el.Value as OpenApiParameter);
+                        break;
+                    
+                    case OpenApiConstants.SecurityScheme:
+                        temp_document.Components.SecuritySchemes.Add(el.Key, el.Value as OpenApiSecurityScheme);
                         break;
                 }
 

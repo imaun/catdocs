@@ -92,7 +92,7 @@ public static class ConvertCommand
         }
 
         var parser = new OpenAPISpecParser(
-            file.FullName, spec_version, spec_format, true, true);
+            file.FullName, spec_version, spec_format, false, false);
 
         var parse_result = parser.Load();
         if (parse_result.HasErrors)

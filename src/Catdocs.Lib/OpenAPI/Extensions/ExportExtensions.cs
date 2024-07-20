@@ -139,6 +139,11 @@ public static class ExportExtensions
             return OpenApiConstants.Callback_Dir;
         }
 
+        if (type == typeof(OpenApiSecurityScheme))
+        {
+            return OpenApiConstants.SecurityScheme_Dir;
+        }
+
         throw new NotSupportedException("OpenAPI type not supported!");
     }
 
