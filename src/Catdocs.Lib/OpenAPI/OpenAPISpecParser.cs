@@ -22,6 +22,7 @@ public class OpenAPISpecParser
     private bool _inlineExternal;
     private long _splitTime;
     private long _buildTime;
+    private long _convertTime;
 
     private void AddError(string error)
     {
@@ -53,6 +54,10 @@ public class OpenAPISpecParser
     public long SplitTime => _splitTime;
 
     public long BuildTime => _buildTime;
+
+    public long ConvertTime => _convertTime;
+
+    public long ParseTime => _parseTime;
     
     public OpenApiSpecInfo Load()
     {
@@ -116,6 +121,9 @@ public class OpenAPISpecParser
     {
         ArgumentNullException.ThrowIfNullOrWhiteSpace(targetFilename);
 
+        var stop_watch = new Stopwatch();
+        stop_watch.Start();
+        
         string output = string.Empty;
 
         if (format is OpenApiFormat.Json)
@@ -128,6 +136,9 @@ public class OpenAPISpecParser
         }
 
         SaveToFile(filePath: targetFilename, content: output);
+        
+        stop_watch.Stop();
+        _convertTime = stop_watch.ElapsedMilliseconds;
     }
 
     private string Convert(OpenApiFormat format)

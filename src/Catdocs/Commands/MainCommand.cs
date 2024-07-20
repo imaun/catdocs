@@ -32,11 +32,12 @@ public static class MainCommand
         
         _command.AddCommand(SplitCommand.GetCommand());
         _command.AddCommand(BuildCommand.GetCommand());
+        _command.AddCommand(ConvertCommand.GetCommand());
 
         await _command.InvokeAsync(args);
     }
 
-    public static void Run(FileInfo file, string version, string format)
+    private static void Run(FileInfo file, string version, string format)
     {
         if (file is null)
         {
@@ -50,8 +51,8 @@ public static class MainCommand
             return;
         }
         
-        var spec_version = OpenApiSpecVersion.OpenApi3_0;
-        var spec_format = OpenApiFormat.Yaml;
+        OpenApiSpecVersion spec_version;
+        OpenApiFormat spec_format;
 
         if (version == "2.0" || version == "2")
         {

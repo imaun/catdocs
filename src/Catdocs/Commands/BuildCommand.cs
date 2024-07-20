@@ -41,7 +41,7 @@ public static class BuildCommand
     }
 
 
-    public static void Run(FileInfo file, string version, string format, string outputFile)
+    private static void Run(FileInfo file, string version, string format, string outputFile)
     {
         if (file is null)
         {
