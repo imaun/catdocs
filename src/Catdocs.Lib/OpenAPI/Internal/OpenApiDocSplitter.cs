@@ -103,6 +103,7 @@ internal class OpenApiDocSplitter
         ExportRequestBodies();
         ExportLinks();
         ExportExamples();
+        ExportSecuritySchemes();
     }
 
     private void ExportSchemas()
@@ -136,6 +137,17 @@ internal class OpenApiDocSplitter
         }
         
         Export(_document.Components.Examples);
+    }
+
+    private void ExportSecuritySchemes()
+    {
+        if (!_document.Components.SecuritySchemes.Any())
+        {
+            SpecLogger.Log("No SecuritySchemes found!");
+            return;
+        }
+        
+        Export(_document.Components.SecuritySchemes);
     }
 
     private void ExportHeaders()
