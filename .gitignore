@@ -403,3 +403,5 @@ FodyWeavers.xsd
 **/sample.yaml
 
 **/out/
+**/out1/
+**/out2/
