@@ -9,4 +9,7 @@ public record OpenApiSpecInfo(
     bool IsYaml,
     List<string> Errors,
     long ParseTime
-    );
+)
+{
+    public bool Success => !HasErrors;
+}

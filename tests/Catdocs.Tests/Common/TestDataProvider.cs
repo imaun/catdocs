@@ -5,14 +5,15 @@ public class TestDataProvider
 
     private const string _rootTestDataDir = "TestDataFiles";
 
-    private static string GetRootTestDataDir()
+    public static string GetRootTestDataDir()
     {
         return _rootTestDataDir;
     }
 
-    private static string GetTestDataFilePath(string filePath)
+    public static string GetTestDataFilePath(string filePath)
     {
-        return Path.Combine(GetRootTestDataDir(), filePath);
+        var fileInfo = new FileInfo(Path.GetFullPath(Path.Combine(GetRootTestDataDir(), filePath)));
+        return fileInfo.FullName;
     }
 
     public static string ReadFileAsString(string filePath)

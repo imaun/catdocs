@@ -25,4 +25,13 @@
       <ProjectReference Include="..\..\src\Catdocs.Lib\Catdocs.Lib.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="TestDataFiles\invalid_simple_oas.yaml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="TestDataFiles\valid_simple_oas.yaml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>
