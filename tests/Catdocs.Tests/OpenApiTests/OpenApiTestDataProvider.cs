@@ -2,7 +2,7 @@
 
 namespace Catdocs.Tests.Common;
 
-public static class OpenApiTestDataProvider
+public class OpenApiTestDataProvider : TestDataProvider
 {
 
     public static TheoryData<string, string, string> GetRelativePathTestData()
@@ -26,4 +26,6 @@ public static class OpenApiTestDataProvider
 
         return data;
     }
+    
+    
 }
