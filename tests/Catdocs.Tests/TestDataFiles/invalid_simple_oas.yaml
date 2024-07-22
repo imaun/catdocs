@@ -16,11 +16,7 @@ paths:
               schema:
                 type: array
                 items:
-                  type: object
-                  properties:
-                    id:
-                      type: integer
-                      format: int64
+                  
 servers:
   - url: http://api.example.com/v1
 components:
@@ -30,6 +26,7 @@ components:
       required:
         - id
         - name
+        - category
       properties:
         id:
           type: integer

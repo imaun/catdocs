@@ -1,7 +1,10 @@
-﻿namespace Catdocs.Lib.OpenAPI;
+﻿using Microsoft.OpenApi.Models;
+
+namespace Catdocs.Lib.OpenAPI;
 
 public record OpenApiSpecInfo(
-    string InputFile,
+    string InputFilePath,
+    OpenApiDocument Document,
     bool HasErrors,
     string Version,
     string Format,

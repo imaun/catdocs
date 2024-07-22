@@ -92,6 +92,7 @@ public class OpenAPISpecParser
 
         return new OpenApiSpecInfo(
             _inputFile,
+            _document,
             _hasErrors,
             _version.ToStr(),
             _format.ToStr(),

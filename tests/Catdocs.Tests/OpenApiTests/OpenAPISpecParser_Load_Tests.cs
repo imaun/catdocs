@@ -13,7 +13,6 @@ public class OpenAPISpecParser_Load_Tests
     public void load_valid_open_api_document_should_succeed(
         OpenApiSpecVersion version, OpenApiFormat format, string filePath)
     {
-        
         var parser = new OpenAPISpecParser(
             TestDataProvider.GetTestDataFilePath(filePath), version, format
             );
@@ -23,5 +22,24 @@ public class OpenAPISpecParser_Load_Tests
         Assert.NotNull(info);
         Assert.True(info.Success);
         Assert.Empty(info.Errors);
+    }
+    
+    
+    [Theory]
+    [InlineData(OpenApiSpecVersion.OpenApi3_0, OpenApiFormat.Yaml, "invalid_simple_oas.yaml")]
+    [InlineData(OpenApiSpecVersion.OpenApi3_0, OpenApiFormat.Json, "invalid_simple_oas.json")]
+    public void load_invalid_open_api_document_with_errors_should_not_succeed(
+        OpenApiSpecVersion version, OpenApiFormat format, string filePath)
+    {
+        var parser = new OpenAPISpecParser(
+            TestDataProvider.GetTestDataFilePath(filePath), version, format
+            );
+
+        var info = parser.Load();
+
+        Assert.NotNull(info);
+        Assert.False(info.Success);
+        Assert.True(info.HasErrors);
+        Assert.NotEmpty(info.Errors);
     }
 }

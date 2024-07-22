@@ -27,13 +27,13 @@
 
     <ItemGroup>
       <None Update="TestDataFiles\invalid_simple_oas.yaml">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="TestDataFiles\valid_simple_oas.yaml">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="TestDataFiles\invalid_simple_oas.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="TestDataFiles\valid_simple_oas.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
