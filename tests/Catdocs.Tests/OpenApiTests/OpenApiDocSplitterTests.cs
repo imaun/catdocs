@@ -1,5 +1,6 @@
 ﻿using Catdocs.Lib.OpenAPI.Internal;
 using Microsoft.OpenApi.Models;
+using Catdocs.Tests.Common;
 
 namespace Catdocs.Tests.OpenApiTests;
 

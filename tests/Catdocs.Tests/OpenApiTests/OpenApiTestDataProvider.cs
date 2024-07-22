@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Catdocs.Tests.OpenApiTests;
+namespace Catdocs.Tests.Common;
 
 public static class OpenApiTestDataProvider
 {
