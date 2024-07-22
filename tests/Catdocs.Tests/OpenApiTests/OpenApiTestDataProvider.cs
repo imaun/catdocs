@@ -1,4 +1,6 @@
 ﻿using System.Runtime.InteropServices;
+using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi.Readers;
 
 namespace Catdocs.Tests.Common;
 
@@ -8,9 +10,7 @@ public class OpenApiTestDataProvider : TestDataProvider
     public static TheoryData<string, string, string> GetRelativePathTestData()
     {
         var data = new TheoryData<string, string, string>();
-
-        var dirSep = Path.DirectorySeparatorChar;
-
+        
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             data.Add(@"C:\example\output\paths\get_by_id.yaml", @"C:\example\output", @"paths\get_by_id.yaml");
@@ -26,6 +26,12 @@ public class OpenApiTestDataProvider : TestDataProvider
 
         return data;
     }
-    
-    
+
+    public static (OpenApiDocument, OpenApiDiagnostic) LoadOpenApiDocument(string filePath)
+    {
+        var reader = new OpenApiStringReader();
+        var document = reader.Read(filePath, out var diagnostic);
+
+        return (document, diagnostic);
+    }
 }

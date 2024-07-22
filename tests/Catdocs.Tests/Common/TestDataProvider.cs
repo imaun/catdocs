@@ -5,17 +5,17 @@ public class TestDataProvider
 
     private const string _rootTestDataDir = "TestDataFiles";
 
-    protected virtual string GetRootTestDataDir()
+    private static string GetRootTestDataDir()
     {
         return _rootTestDataDir;
     }
 
-    protected string GetTestDataFilePath(string filePath)
+    private static string GetTestDataFilePath(string filePath)
     {
         return Path.Combine(GetRootTestDataDir(), filePath);
     }
 
-    public string ReadFileAsString(string filePath)
+    public static string ReadFileAsString(string filePath)
     {
         return File.ReadAllText(GetTestDataFilePath(filePath));
     }
