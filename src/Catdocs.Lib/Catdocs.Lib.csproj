@@ -4,6 +4,17 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <PackageId>Catdocs.OpenApi</PackageId>
+    <Version>0.5</Version>
+    <Authors>Iman Nemati</Authors>
+    <Company>Imaun</Company>
+    <Description>
+      Library to parse, validate, split, combine OpenAPI specification files.
+    </Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/imaun/catdocs</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/imaun/catdocs</RepositoryUrl>
+    <PackageTags>openapi;swagger;split-open-api</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
