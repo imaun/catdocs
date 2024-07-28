@@ -19,4 +19,8 @@ public class OpenApiDocSplitterTests
 
         Assert.Equal(expectedRelativePath, actualRelativePath);
     }
+    
+    public void split_simple_oas()
+    {
+    }
 }
