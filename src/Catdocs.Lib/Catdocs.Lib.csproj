@@ -14,7 +14,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/imaun/catdocs</PackageProjectUrl>
     <RepositoryUrl>https://github.com/imaun/catdocs</RepositoryUrl>
-    <PackageTags>openapi;swagger;split-open-api</PackageTags>
+    <PackageTags>openapi;swagger;openapi3;api-documentation</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
