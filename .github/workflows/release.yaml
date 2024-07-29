@@ -1,1 +1,35 @@
-﻿
+﻿name: release
+
+on:
+  push:
+    branches: ["release"]
+
+jobs:
+  build:
+    
+    runs-on: ubuntun-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore
+
+      - name: Test
+        run: dotnet test --no-build --verbosity normal
+
+      - name: Nuget Pack
+        run: dotnet pack ./src/Catdocs.Lib/Catdocs.Lib.csproj -c Release
+
+      - name: Nuget Publish
+        env:
+          NUGET_TOKEN: ${{ secrets.NUGET_KEY }}
+        run: dotnet nuget push ./src/Catdocs.Lib/bin/Release/*.nupkg -k $NUGET_TOKEN -s https://api.nuget.org/v3/index.json --skip-duplicate
+        
