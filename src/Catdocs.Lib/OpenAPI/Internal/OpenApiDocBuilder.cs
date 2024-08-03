@@ -18,7 +18,7 @@ internal class OpenApiDocBuilder
         OpenApiSpecVersion version, 
         OpenApiFormat format)
     {
-        ArgumentNullException.ThrowIfNullOrWhiteSpace(inputDir);
+        ArgumentException.ThrowIfNullOrWhiteSpace(inputDir);
         ArgumentNullException.ThrowIfNull(document);
 
         _document = document;
@@ -50,19 +50,17 @@ internal class OpenApiDocBuilder
         }
 
         _document.Paths = api_paths;
-        
-        _document.Components = new OpenApiComponents
-        {
-            Schemas = ResolveReferences<OpenApiSchema>(),
-            Callbacks = ResolveReferences<OpenApiCallback>(),
-            Examples = ResolveReferences<OpenApiExample>(),
-            Parameters = ResolveReferences<OpenApiParameter>(),
-            Headers = ResolveReferences<OpenApiHeader>(),
-            Responses = ResolveReferences<OpenApiResponse>(),
-            RequestBodies = ResolveReferences<OpenApiRequestBody>(),
-            Links = ResolveReferences<OpenApiLink>(),
-            //SecuritySchemes = ResolveReferences<OpenApiSecurityScheme>()
-        };
+
+        _document.Components ??= new OpenApiComponents();
+
+        _document.Components.Schemas = ResolveReferences<OpenApiSchema>();
+        _document.Components.Callbacks = ResolveReferences<OpenApiCallback>();
+        _document.Components.Examples = ResolveReferences<OpenApiExample>();
+        _document.Components.Parameters = ResolveReferences<OpenApiParameter>();
+        _document.Components.Headers = ResolveReferences<OpenApiHeader>();
+        _document.Components.Responses = ResolveReferences<OpenApiResponse>();
+        _document.Components.RequestBodies = ResolveReferences<OpenApiRequestBody>();
+        _document.Components.Links = ResolveReferences<OpenApiLink>();
 
         return _document;
     }
@@ -72,7 +70,7 @@ internal class OpenApiDocBuilder
     {
         var reader = new OpenApiStreamReader(new OpenApiReaderSettings
         {
-            ReferenceResolution = ReferenceResolutionSetting.DoNotResolveReferences
+            ReferenceResolution = ReferenceResolutionSetting.DoNotResolveReferences,
         });
         
         using var file_stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
