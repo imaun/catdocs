@@ -61,7 +61,7 @@ internal class OpenApiDocBuilder
             Responses = ResolveReferences<OpenApiResponse>(),
             RequestBodies = ResolveReferences<OpenApiRequestBody>(),
             Links = ResolveReferences<OpenApiLink>(),
-            SecuritySchemes = ResolveReferences<OpenApiSecurityScheme>()
+            //SecuritySchemes = ResolveReferences<OpenApiSecurityScheme>()
         };
 
         return _document;
