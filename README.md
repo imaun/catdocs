@@ -44,7 +44,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ---
 
-We hope Catdocs helps your team manage OpenAPI documentation more efficiently and effectively. Happy documenting!
+We hope Catdocs helps your team manage OpenAPI documentation more efficiently and effectively.
 
 
 
