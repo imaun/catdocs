@@ -7,7 +7,7 @@ on:
 jobs:
   build:
     
-    runs-on: ubuntun-latest
+    runs-on: ubuntu-latest
     
     steps:
       - uses: actions/checkout@v3
