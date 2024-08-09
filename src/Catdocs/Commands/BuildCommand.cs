@@ -58,32 +58,60 @@ public static class BuildCommand
         var spec_version = OpenApiSpecVersion.OpenApi3_0;
         var spec_format = OpenApiFormat.Yaml;
         
-        if (version == "2.0" || version == "2")
+        switch (version)
         {
-            spec_version = OpenApiSpecVersion.OpenApi2_0;
+            case "2.0":
+            case "2":
+                spec_version = OpenApiSpecVersion.OpenApi2_0;
+                break;
+            case "3.0":
+            case "3":
+                spec_version = OpenApiSpecVersion.OpenApi3_0;
+                break;
+            default:
+            {
+                if (string.IsNullOrWhiteSpace(version))
+                {
+                    spec_version = OpenApiSpecVersion.OpenApi3_0;
+                }
+                else
+                {
+                    Console.WriteLine("Error: OpenApiSpec Version is not valid!");
+                    return;
+                }
+
+                break;
+            }
         }
-        else if (version == "3.0" || version == "3")
-        {
-            spec_version = OpenApiSpecVersion.OpenApi3_0;
-        }
-        else
-        {
-            Console.WriteLine("Error: OpenApiSpec Version is not valid!");
-            return;
-        }
+
         
-        if (format.ToLower() == "json")
+        switch (format.ToLower())
         {
-            spec_format = OpenApiFormat.Json;
-        }
-        else if (format.ToLower() == "yaml")
-        {
-            spec_format = OpenApiFormat.Yaml;
-        }
-        else
-        {
-            Console.WriteLine("Error: OpenApiSpec format is not valid!");
-            return;
+            case "json":
+                spec_format = OpenApiFormat.Json;
+                break;
+            case "yaml":
+                spec_format = OpenApiFormat.Yaml;
+                break;
+            default:
+            {
+                if (string.IsNullOrWhiteSpace(format))
+                {
+                    spec_format = file.Extension.ToLower() switch
+                    {
+                        ".json" => OpenApiFormat.Json,
+                        ".yaml" => OpenApiFormat.Yaml,
+                        _ => spec_format
+                    };
+                }
+                else
+                {
+                    Console.WriteLine("Error: OpenApiSpec format is not valid!");
+                    return;
+                }
+
+                break;
+            }
         }
         
         var parser = new OpenAPISpecParser(
