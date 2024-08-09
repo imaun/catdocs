@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{35E4E345
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Catdocs.Tests", "tests\Catdocs.Tests\Catdocs.Tests.csproj", "{5F9F9E68-A2B5-40ED-8D52-714E2C881746}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Catdocs.Editor", "src\Catdocs.Editor\Catdocs.Editor.csproj", "{596F1FB5-C652-443F-A21A-C440EB3953EE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,7 @@ Global
 		{F8521AAD-412E-4191-98FF-D966A2D682C3} = {1A79F16E-4574-4E51-96AE-4B53296499F6}
 		{CD177B38-6B14-47E6-BA26-B85237D6C36B} = {1A79F16E-4574-4E51-96AE-4B53296499F6}
 		{5F9F9E68-A2B5-40ED-8D52-714E2C881746} = {35E4E345-9F1E-43AF-8787-1EE286CB4121}
+		{596F1FB5-C652-443F-A21A-C440EB3953EE} = {1A79F16E-4574-4E51-96AE-4B53296499F6}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{F8521AAD-412E-4191-98FF-D966A2D682C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -39,5 +42,9 @@ Global
 		{5F9F9E68-A2B5-40ED-8D52-714E2C881746}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5F9F9E68-A2B5-40ED-8D52-714E2C881746}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5F9F9E68-A2B5-40ED-8D52-714E2C881746}.Release|Any CPU.Build.0 = Release|Any CPU
+		{596F1FB5-C652-443F-A21A-C440EB3953EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{596F1FB5-C652-443F-A21A-C440EB3953EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{596F1FB5-C652-443F-A21A-C440EB3953EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{596F1FB5-C652-443F-A21A-C440EB3953EE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
