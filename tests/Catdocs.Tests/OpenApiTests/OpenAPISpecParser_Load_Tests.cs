@@ -13,7 +13,7 @@ public class OpenAPISpecParser_Load_Tests
     public void load_valid_open_api_document_should_succeed(
         OpenApiSpecVersion version, OpenApiFormat format, string filePath)
     {
-        var parser = new OpenAPISpecParser(
+        var parser = new OpenApiDocParser(
             TestDataProvider.GetTestDataFilePath(filePath), version, format
             );
 
@@ -31,7 +31,7 @@ public class OpenAPISpecParser_Load_Tests
     public void load_invalid_open_api_document_with_errors_should_not_succeed(
         OpenApiSpecVersion version, OpenApiFormat format, string filePath)
     {
-        var parser = new OpenAPISpecParser(
+        var parser = new OpenApiDocParser(
             TestDataProvider.GetTestDataFilePath(filePath), version, format
             );
 

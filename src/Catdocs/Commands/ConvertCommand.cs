@@ -91,7 +91,7 @@ public static class ConvertCommand
             return;
         }
 
-        var parser = new OpenAPISpecParser(
+        var parser = new OpenApiDocParser(
             file.FullName, spec_version, spec_format, false, false);
 
         var parse_result = parser.Load();
