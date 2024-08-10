@@ -36,7 +36,7 @@ public class OpenApiDocumentFile
 
     private OpenApiSpecInfo Load()
     {
-        var parser = new OpenAPISpecParser(FilePath);
+        var parser = new OpenApiDocParser(FilePath);
         return parser.Load();
     }
 }
