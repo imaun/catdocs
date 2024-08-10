@@ -84,7 +84,7 @@ public static class SplitCommand
             return;
         }
         
-        var parser = new OpenAPISpecParser(
+        var parser = new OpenApiDocParser(
             file.FullName, spec_version, spec_format, true, true);
         
         var parse_result = parser.Load();

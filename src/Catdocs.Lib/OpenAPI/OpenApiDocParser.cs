@@ -8,7 +8,7 @@ using Catdocs.Lib.OpenAPI.Internal;
 
 namespace Catdocs.Lib.OpenAPI;
 
-public class OpenAPISpecParser
+public class OpenApiDocParser
 {
     private readonly string _inputFile;
     private long _parseTime;
@@ -31,7 +31,7 @@ public class OpenAPISpecParser
         _errors.Add(error);
     }
 
-    public OpenAPISpecParser(
+    public OpenApiDocParser(
         string inputPath, 
         OpenApiSpecVersion version = OpenApiSpecVersion.OpenApi3_0,
         OpenApiFormat format = OpenApiFormat.Yaml,
