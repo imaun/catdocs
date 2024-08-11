@@ -1,0 +1,16 @@
+openapi: 3.0.1
+info:
+  title: Pet API
+  description: API for managing pets (cats and dogs)
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/api
+    description: Local server
+paths:
+  /pets:
+    $ref: paths/pets.yaml#/components/paths//pets
+  '/pets/{id}':
+    $ref: 'paths/pets_{id}.yaml#/components/paths//pets/{id}'
+  '/pets/byname/{name}':
+    $ref: 'paths/pets_byname_{name}.yaml#/components/paths//pets/byname/{name}'
+components: { }
