@@ -25,3 +25,18 @@ jobs:
 
       - name: Bundle example OpenAPI
         run: dotnet run --project src/Catdocs/Catdocs.csproj build --file examples/bundle-pipeline/OpenApi.yaml -v 3 --format yaml --output examples/bundle-pipeline/output.yaml
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit changes
+        run: |
+          git add examples/bundle-pipeline/output.yaml
+          git commit -m "Add generated output.yaml file"
+
+      - name: Push changes
+        run: git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
