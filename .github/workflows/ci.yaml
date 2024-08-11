@@ -24,4 +24,4 @@ jobs:
         run: dotnet test --no-build --verbosity normal
 
       - name: Bundle example OpenAPI
-        run: dotnet run --project src/Catdocs/Catdocs.csproj --file examples/bundle-pipeline/OpenApi.yaml -v 3 --format yaml --output examples/bundle-pipeline/output.yaml
+        run: dotnet run --project src/Catdocs/Catdocs.csproj build --file examples/bundle-pipeline/OpenApi.yaml -v 3 --format yaml --output examples/bundle-pipeline/output.yaml
