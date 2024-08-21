@@ -138,5 +138,5 @@ We welcome contributions!
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ## Contact
-imun22 with gmail in the end!
----
+
+imun22 with gmail at the end!
