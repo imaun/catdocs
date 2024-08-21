@@ -104,6 +104,6 @@ public static class ConvertCommand
         }
         
         parser.ConvertTo(target_format, outputFile);
-        Console.WriteLine($"Convert took: {parser.BuildTime} ms");
+        Console.WriteLine($"Convert took: {parser.BundleTime} ms");
     }
 }

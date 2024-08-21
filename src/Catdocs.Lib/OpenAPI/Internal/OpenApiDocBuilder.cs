@@ -28,7 +28,7 @@ internal class OpenApiDocBuilder
     }
 
 
-    public OpenApiDocument Build()
+    public OpenApiDocument Bundle()
     {
         var api_paths = new OpenApiPaths();
         foreach (var path in _document.Paths)

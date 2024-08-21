@@ -1,18 +1,18 @@
-﻿using System.CommandLine;
+using System.CommandLine;
 using Catdocs.Lib.OpenAPI;
 using Microsoft.OpenApi;
 
 namespace Catdocs.Commands;
 
-public static class BuildCommand
+public static class BundleCommand
 {
     private static Command _command =
-        new("build", description: "Build an OpenAPI document from multiple referenced files.");
+        new("bundle", description: "Bundle an OpenAPI document from multiple referenced files.");
 
     private static Option<FileInfo> _fileOption = new(
         aliases: ["--file", "--source", "-s", "--spec"],
         description: "The path to OpenAPI spec file.");
-    
+
     private static Option<string> _openApiVersionArg = new(
         aliases: ["--spec-version", "--spec-ver", "-v"],
         getDefaultValue: () => "3.0",
@@ -34,7 +34,7 @@ public static class BuildCommand
         _command.AddOption(_openApiVersionArg);
         _command.AddOption(_openApiFormatArg);
         _command.AddOption(_outputDirArg);
-        
+
         _command.SetHandler(Run, _fileOption, _openApiVersionArg, _openApiFormatArg, _outputDirArg);
 
         return _command;
@@ -48,16 +48,16 @@ public static class BuildCommand
             Console.WriteLine("Error: Filename is not valid!");
             return;
         }
-        
+
         if (!file.Exists)
         {
             Console.WriteLine($"Error: File '{file.Name}' not found!");
             return;
         }
-        
+
         var spec_version = OpenApiSpecVersion.OpenApi3_0;
         var spec_format = OpenApiFormat.Yaml;
-        
+
         switch (version)
         {
             case "2.0":
@@ -69,22 +69,22 @@ public static class BuildCommand
                 spec_version = OpenApiSpecVersion.OpenApi3_0;
                 break;
             default:
-            {
-                if (string.IsNullOrWhiteSpace(version))
                 {
-                    spec_version = OpenApiSpecVersion.OpenApi3_0;
-                }
-                else
-                {
-                    Console.WriteLine("Error: OpenApiSpec Version is not valid!");
-                    return;
-                }
+                    if (string.IsNullOrWhiteSpace(version))
+                    {
+                        spec_version = OpenApiSpecVersion.OpenApi3_0;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Error: OpenApiSpec Version is not valid!");
+                        return;
+                    }
 
-                break;
-            }
+                    break;
+                }
         }
 
-        
+
         switch (format.ToLower())
         {
             case "json":
@@ -94,39 +94,39 @@ public static class BuildCommand
                 spec_format = OpenApiFormat.Yaml;
                 break;
             default:
-            {
-                if (string.IsNullOrWhiteSpace(format))
                 {
-                    spec_format = file.Extension.ToLower() switch
+                    if (string.IsNullOrWhiteSpace(format))
                     {
-                        ".json" => OpenApiFormat.Json,
-                        ".yaml" => OpenApiFormat.Yaml,
-                        _ => spec_format
-                    };
-                }
-                else
-                {
-                    Console.WriteLine("Error: OpenApiSpec format is not valid!");
-                    return;
-                }
+                        spec_format = file.Extension.ToLower() switch
+                        {
+                            ".json" => OpenApiFormat.Json,
+                            ".yaml" => OpenApiFormat.Yaml,
+                            _ => spec_format
+                        };
+                    }
+                    else
+                    {
+                        Console.WriteLine("Error: OpenApiSpec format is not valid!");
+                        return;
+                    }
 
-                break;
-            }
+                    break;
+                }
         }
-        
+
         var parser = new OpenApiDocParser(
             file.FullName, spec_version, spec_format, true, true);
-        
+
         var parse_result = parser.Load();
         if (parse_result.HasErrors)
         {
             ConsoleExtensions.WriteErrorLine("🩻 Found some errors: ");
             parse_result.Errors.WriteListToConsole(useLineNo: true, useTab: true, color: ConsoleColor.Red);
-            
+
             return;
         }
-        
-        parser.Build(outputFile);
-        Console.WriteLine($"Build took: {parser.BuildTime} ms");
+
+        parser.Bundle(outputFile);
+        Console.WriteLine($"Build took: {parser.BundleTime} ms");
     }
 }
