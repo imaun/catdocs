@@ -108,7 +108,7 @@ final OpenAPI specification. This bundled file can then be pushed back to the re
 such as API testing or deployment.
 
 ### Example pipeline
-Actually, Catdocs CI pipeline uitself, is an example of a sample pipeline using GitHub Actions.
+Actually, [Catdocs CI pipeline](https://github.com/imaun/catdocs/blob/55fa3ac30dad3c0f2299fa27f442d8624a4e97c3/.github/workflows/ci.yaml#L26) uitself, is an example of a sample pipeline using GitHub Actions.
 This setup assumes that the OpenAPI components are stored in a directory structure
 created by the split command and that the final bundle should be updated in the repository.
 
