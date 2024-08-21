@@ -34,7 +34,7 @@ internal class OpenApiDocBuilder
         foreach (var path in _document.Paths)
         {
             if (path.Value.Reference is not null)
-            {
+            {   
                 var pathRef = path.Value.Reference.ExternalResource;
                 var filePath = Path.Combine(_inputDir, pathRef);
                 var pathDoc = LoadApiPathDocument(Path.GetFullPath(filePath));

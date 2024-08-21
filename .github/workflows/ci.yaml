@@ -31,12 +31,19 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+      - name: Example pipeline check
+        id: check_example_changes
+        run: |
+          git diff --exit-code --quiet examples/bundle-pipeline/output.yaml || echo "example_pipeline_changed"
+
       - name: Commit changes
+        if: steps.check_example_changes.outputs.changes == 'example_pipeline_changed'
         run: |
           git add examples/bundle-pipeline/output.yaml
           git commit -m "Add generated output.yaml file"
 
       - name: Push changes
+        if: steps.check_example_changes.outputs.changes == 'example_pipeline_changed'
         run: git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
