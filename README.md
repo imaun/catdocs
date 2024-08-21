@@ -36,6 +36,36 @@ for all API management commands in Redocly, excluding the generation of OpenAPI 
 5. **Version Control**: Use Git to manage changes, enabling team collaboration and maintaining a history of modifications.
 
 ## Getting Started
+You should check if .NET 8 is already installed on your system, you can run the following command in your terminal:
+```bash
+dotnet --version
+```
+
+If not, for Windows you have to download .NET 8 SDK, for Linux you can run:
+```bash
+sudo apt-get update && \
+sudo apt-get install -y dotnet-sdk-8.0
+```
+And for Mac:
+```bash
+brew update
+brew install --cask dotnet-sdk
+```
+
+Run the following command to clone the repository:
+```bash
+git clone https://github.com/imaun/catdocs.git
+```
+Navigate to the cloned repository's directory and build the project:
+```bash
+cd catdocs
+dotnet build
+```
+You can now run Catdocs using the dotnet run command followed by the specific command you wish to use. For example, to get statistics of an OpenAPI document:
+
+```bash
+dotnet run -- stats --file path/to/your/openapi.yaml --format yaml
+```
 
 ## Commands
 Catdocs supports several commands to help you work with OpenAPI documents: stats, split, bundle, and convert.
