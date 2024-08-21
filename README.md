@@ -6,6 +6,11 @@ Welcome to **Catdocs**! This repository contains tools, libraries, and a CLI for
 
 Catdocs is an OpenAPI documentation tool that streamlines the process of managing API documentation for teams. By enabling the splitting of OpenAPI documents, Catdocs allows different teams or individuals to work on separate parts of the API documentation, ensuring efficient and organized collaboration.
 
+Catdocs is a powerful command-line interface (CLI) tool offering robust support for API management similar to the capabilities provided by
+the [Redocly CLI](https://redocly.com/docs/cli/commands).
+This tool comes with comprehensive support
+for all API management commands in Redocly, excluding the generation of OpenAPI documentation previews and related commands.
+
 ## Features
 
 - **OpenAPI Documentation Management**: Easily handle large OpenAPI documents by splitting them into manageable parts.
@@ -88,6 +93,42 @@ Options:
 - **--spec-ver** (Aliases: --spec-version, -v): The OpenAPI specification version (2 or 3). Default is 3.
 - **--format**: The source file format (json or yaml). The output will be in the opposite format.
 - **--output**: The destination filename for the output file of this command.
+
+# Integrates into your pipeline
+Catdocs is particularly effective when integrated into CI/CD pipelines, facilitating the management of large OpenAPI specifications within a team. By utilizing the bundle command, you can automate the process of combining multiple OpenAPI components into a single document. This is crucial for teams where different members or groups work on separate parts of the API specification.
+
+### Scenario
+Imagine a scenario where your API specification is split into multiple components, each maintained in separate files as per the split command's functionality. Each team member contributes to different aspects of the API, such as paths, responses, or schemas, by updating their respective files. Once changes are committed and pushed to the repository, you need a reliable way to combine these individual components back into a cohesive API document.
+
+### Pipeline Integration
+To facilitate this, you can incorporate Catdocs into your CI/CD pipeline.
+Upon a merge request or push to a specific branch (typically main or master),
+the pipeline triggers the bundle command to automatically assemble the updated components into a
+final OpenAPI specification. This bundled file can then be pushed back to the repository or passed along to other stages in your pipeline,
+such as API testing or deployment.
+
+### Example pipeline
+Actually, Catdocs CI pipeline uitself, is an example of a sample pipeline using GitHub Actions.
+This setup assumes that the OpenAPI components are stored in a directory structure
+created by the split command and that the final bundle should be updated in the repository.
+
+## Using in .NET projects
+Since Catdocs OpenAPI is built for .NET developers,
+integrating it into your existing .NET applications is seamless.
+After adding the package to your project, you can use it's library in your projects.
+
+To begin using Catdocs OpenAPI in your .NET projects, you can easily install it via NuGet. The tool is packaged as a .NET 8 library, making it straightforward to integrate into your existing applications.
+
+You can install the Catdocs.OpenAPI package by running the following command in your project directory:
+
+```bash
+dotnet add package Catdocs.OpenAPI
+```
+This command will download and add the Catdocs.OpenAPI package to your project, allowing you to utilize its features directly within your .NET environment.
+
+
+or integrate it into your build and CI/CD pipelines.
+This integration ensures that your API management processes are tightly coupled with your development workflow, enhancing efficiency and reliability.
 
 ## Contributing
 
