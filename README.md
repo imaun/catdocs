@@ -2,6 +2,8 @@
 ## Maintain OpenAPI documentations with ease
 Welcome to **Catdocs**! This repository contains tools, libraries, and a CLI for managing OpenAPI documentation, specifically designed for teams working collaboratively on APIs.
 
+![Catdocs](./assets/catdocs-header.png)
+
 ## Introduction
 
 Catdocs is an OpenAPI documentation tool that streamlines the process of managing API documentation for teams. By enabling the splitting of OpenAPI documents, Catdocs allows different teams or individuals to work on separate parts of the API documentation, ensuring efficient and organized collaboration.
