@@ -8,7 +8,7 @@ using Catdocs.Lib.OpenAPI.Internal;
 
 namespace Catdocs.Lib.OpenAPI;
 
-public class OpenAPISpecParser
+public class OpenApiDocParser
 {
     private readonly string _inputFile;
     private long _parseTime;
@@ -21,7 +21,7 @@ public class OpenAPISpecParser
     private bool _inlineLocal;
     private bool _inlineExternal;
     private long _splitTime;
-    private long _buildTime;
+    private long _bundleTime;
     private long _convertTime;
 
     private void AddError(string error)
@@ -31,7 +31,7 @@ public class OpenAPISpecParser
         _errors.Add(error);
     }
 
-    public OpenAPISpecParser(
+    public OpenApiDocParser(
         string inputPath, 
         OpenApiSpecVersion version = OpenApiSpecVersion.OpenApi3_0,
         OpenApiFormat format = OpenApiFormat.Yaml,
@@ -53,7 +53,7 @@ public class OpenAPISpecParser
 
     public long SplitTime => _splitTime;
 
-    public long BuildTime => _buildTime;
+    public long BundleTime => _bundleTime;
 
     public long ConvertTime => _convertTime;
 
@@ -186,7 +186,7 @@ public class OpenAPISpecParser
     }
 
 
-    public void Build(string newDocumentFilename)
+    public void Bundle(string newDocumentFilename)
     {
         if (string.IsNullOrWhiteSpace(newDocumentFilename))
         {
@@ -199,13 +199,13 @@ public class OpenAPISpecParser
         var inputDir = GetDirectoryForFilename(_inputFile);
 
         var builder = new OpenApiDocBuilder(inputDir, _document, _version, _format);
-        var new_document = builder.Build();
+        var new_document = builder.Bundle();
         
         new_document.SaveDocumentToFile(_version, _format, newDocumentFilename);
         
         stop_watch.Stop();
-        _buildTime = stop_watch.ElapsedMilliseconds;
-        SpecLogger.Log($"Build completed in : {_buildTime} ms");
+        _bundleTime = stop_watch.ElapsedMilliseconds;
+        SpecLogger.Log($"Build completed in : {_bundleTime} ms");
     }
     
     private static void CreateDirIfNotExists(string path)

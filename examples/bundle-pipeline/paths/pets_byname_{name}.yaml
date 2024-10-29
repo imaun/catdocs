@@ -1,0 +1,22 @@
+openapi: 3.0.1
+info: { }
+paths:
+  '/pets/byname/{name}':
+    get:
+      summary: Get a pet by name
+      operationId: getPetByName
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Pet found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pet'
+        '404':
+          description: Pet not found

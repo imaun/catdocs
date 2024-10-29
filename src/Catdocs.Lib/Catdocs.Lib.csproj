@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PackageId>Catdocs.OpenApi</PackageId>
-    <Version>0.5</Version>
+    <Version>0.6</Version>
     <Authors>Iman Nemati</Authors>
     <Company>Imaun</Company>
     <Description>

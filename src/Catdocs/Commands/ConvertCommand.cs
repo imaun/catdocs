@@ -91,7 +91,7 @@ public static class ConvertCommand
             return;
         }
 
-        var parser = new OpenAPISpecParser(
+        var parser = new OpenApiDocParser(
             file.FullName, spec_version, spec_format, false, false);
 
         var parse_result = parser.Load();
@@ -104,6 +104,6 @@ public static class ConvertCommand
         }
         
         parser.ConvertTo(target_format, outputFile);
-        Console.WriteLine($"Convert took: {parser.BuildTime} ms");
+        Console.WriteLine($"Convert took: {parser.BundleTime} ms");
     }
 }

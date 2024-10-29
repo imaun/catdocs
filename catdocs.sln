@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{35E4E345
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Catdocs.Tests", "tests\Catdocs.Tests\Catdocs.Tests.csproj", "{5F9F9E68-A2B5-40ED-8D52-714E2C881746}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sample-pipeline", "sample-pipeline", "{42E21B1F-ECE3-4126-8131-01D36E137624}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

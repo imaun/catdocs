@@ -1,0 +1,41 @@
+openapi: 3.0.1
+info: { }
+paths: { }
+components:
+  schemas:
+    Pet:
+      required:
+        - name
+        - breed
+        - type
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the pet
+        name:
+          type: string
+          description: Name of the pet
+        breed:
+          type: string
+          description: Breed of the pet
+        type:
+          enum:
+            - cat
+            - dog
+          type: string
+          description: Type of the pet (cat or dog)
+        birth_date:
+          type: string
+          description: Birth date of the pet
+          format: date
+        image_url:
+          type: string
+          description: URL to the pet's image
+          format: uri
+        owner_name:
+          type: string
+          description: Name of the pet's owner
+        owner_contact:
+          type: string
+          description: Contact information of the pet's owner

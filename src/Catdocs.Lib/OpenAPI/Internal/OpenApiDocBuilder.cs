@@ -28,13 +28,13 @@ internal class OpenApiDocBuilder
     }
 
 
-    public OpenApiDocument Build()
+    public OpenApiDocument Bundle()
     {
         var api_paths = new OpenApiPaths();
         foreach (var path in _document.Paths)
         {
             if (path.Value.Reference is not null)
-            {
+            {   
                 var pathRef = path.Value.Reference.ExternalResource;
                 var filePath = Path.Combine(_inputDir, pathRef);
                 var pathDoc = LoadApiPathDocument(Path.GetFullPath(filePath));
