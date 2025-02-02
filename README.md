@@ -69,6 +69,13 @@ You can now run Catdocs using the dotnet run command followed by the specific co
 dotnet run -- stats --file path/to/your/openapi.yaml --format yaml
 ```
 
+## Install it with Docker
+To use Catdocs CLI with Docker, pull the latest image from Docker Hub and run it:
+```bash
+docker pull imaun/catdocs:latest
+docker run --rm imaun/catdocs:latest <command> [options]
+```
+
 ## Commands
 Catdocs supports several commands to help you work with OpenAPI documents: stats, split, bundle, and convert.
 
