@@ -75,12 +75,20 @@ internal class OpenApiDocBuilder
         
         using var file_stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
         var doc = reader.Read(file_stream, out var diagnostic);
-        // if (diagnostic is not null)
-        // {
-        //     SpecLogger.LogError(diagnostic.GetErrorLogForElementType(OpenApiConstants.Path, filePath));
-        // }
 
         return doc;
+    }
+
+    internal async Task<OpenApiDocument> LoadApiPathDocumentAsync(string filePath, CancellationToken cancellationToken = default)
+    {
+        var reader = new OpenApiStreamReader(new OpenApiReaderSettings
+        {
+            ReferenceResolution = ReferenceResolutionSetting.DoNotResolveReferences,
+        });
+        
+        using var file_stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+        var doc = await reader.ReadAsync(file_stream, cancellationToken).ConfigureAwait(false);
+        return doc.OpenApiDocument;
     }
 
     internal Dictionary<string, T> ResolveReferences<T>() where T: IOpenApiReferenceable
