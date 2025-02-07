@@ -111,13 +111,7 @@ internal class OpenApiDocBuilder
 
         foreach (var f in files)
         {
-            var reader = new OpenApiStreamReader(new OpenApiReaderSettings
-            {
-                ReferenceResolution = ReferenceResolutionSetting.DoNotResolveReferences
-            });
-            
-            using var file_stream = new FileStream(f, FileMode.Open, FileAccess.Read);
-            var componentPart = reader.Read(file_stream, out var diagnostics);
+            var componentPart = LoadApiPathDocument(f);
             // if (diagnostics is not null)
             // {
             //     SpecLogger.LogError(diagnostics.GetErrorLogForElementType(elementType, f));
@@ -132,12 +126,13 @@ internal class OpenApiDocBuilder
         return result;
     }
 
-
-    internal Dictionary<string, OpenApiSchema> ResolveSchemas()
+    internal async Task<Dictionary<string, T>> ResolveReferenceAsync<T>(CancellationToken cancellationToken = default) 
+        where T : IOpenApiReferenceable
     {
-        var result = new Dictionary<string, OpenApiSchema>();
+        var elementType = typeof(T).GetOpenApiElementTypeName();
+        var result = new Dictionary<string, T>();
         var file_ext = _format.GetFormatFileExtension();
-        var element_dir = Path.Combine(_inputDir, OpenApiConstants.Schema_Dir);
+        var element_dir = Path.Combine(_inputDir, typeof(T).GetOpenApiElementDirectoryName());
 
         if (!Directory.Exists(element_dir))
         {
@@ -152,21 +147,15 @@ internal class OpenApiDocBuilder
 
         foreach (var f in files)
         {
-            var reader = new OpenApiStreamReader(new OpenApiReaderSettings
-            {
-                ReferenceResolution = ReferenceResolutionSetting.DoNotResolveReferences
-            });
-            
-            using var file_stream = new FileStream(f, FileMode.Open, FileAccess.Read);
-            var componentPart = reader.Read(file_stream, out var diagnostics);
+            var componentPart = await LoadApiPathDocumentAsync(f, cancellationToken);
             // if (diagnostics is not null)
             // {
             //     SpecLogger.LogError(diagnostics.GetErrorLogForElementType(elementType, f));
             // }
-
-            foreach (var schema in componentPart.Components.Schemas)
+            
+            foreach (var component in componentPart.GetComponentsWithType<T>(elementType))
             {
-                result.Add(schema.Key, schema.Value);
+                result.Add(component.Key, component.Value);
             }
         }
 
