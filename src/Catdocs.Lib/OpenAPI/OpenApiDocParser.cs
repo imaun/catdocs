@@ -265,7 +265,7 @@ public class OpenApiDocParser
     private static void SaveToFile(string filePath, string content)
     {
         var fs = new FileStream(
-            filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+            filePath, FileMode.Create, FileAccess.Write, FileShare.Read);
         using var stream_writer = new StreamWriter(fs);
         stream_writer.Write(content);
         stream_writer.Flush();
