@@ -10,12 +10,14 @@ internal class OpenApiDocSplitter
     private OpenApiFormat _format;
     private OpenApiSpecVersion _version;
     private readonly Dictionary<string, string> _pathReferenceReplacements = [];
+    private readonly string? _declaredVersion;
 
     public OpenApiDocSplitter(
         string outputDir,
         OpenApiDocument document,
         OpenApiSpecVersion version = OpenApiSpecVersion.OpenApi3_0,
-        OpenApiFormat format = OpenApiFormat.Yaml
+        OpenApiFormat format = OpenApiFormat.Yaml,
+        string? declaredVersion = null
         )
     {
         ArgumentNullException.ThrowIfNull(document, nameof(document));
@@ -23,6 +25,7 @@ internal class OpenApiDocSplitter
         _document = document;
         _version = version;
         _format = format;
+        _declaredVersion = declaredVersion;
 
         _outputDir = outputDir;
         CreateDirIfNotExists(_outputDir);
@@ -57,7 +60,11 @@ internal class OpenApiDocSplitter
                 };
                 
                 temp_document.Paths.Add(path.Key, path.Value);
-                temp_document.SaveDocumentToFile(_version, _format, filename);
+                temp_document.SaveDocumentToFile(
+                    _version,
+                    _format,
+                    filename,
+                    _declaredVersion);
 
                 var referenceId = GetNormalizedOpenApiPathFilename(path.Key);
                 var relativePath = GetRelativePath(filename);
@@ -88,7 +95,8 @@ internal class OpenApiDocSplitter
         var documentContent = _document
             .SerializeDocumentAsync(_version, _format)
             .GetAwaiter()
-            .GetResult();
+            .GetResult()
+            .PreserveDeclaredSpecVersion(_declaredVersion, _format);
         foreach (var replacement in _pathReferenceReplacements)
         {
             documentContent = documentContent.Replace(
@@ -237,7 +245,11 @@ internal class OpenApiDocSplitter
                         $"Unable to add {elementTypeName} component '{el.Key}'.");
                 }
 
-                temp_document.SaveDocumentToFile(_version, _format, filename);
+                temp_document.SaveDocumentToFile(
+                    _version,
+                    _format,
+                    filename,
+                    _declaredVersion);
                 exportedElements.Add((el.Key, filename));
             }
             catch (Exception ex)

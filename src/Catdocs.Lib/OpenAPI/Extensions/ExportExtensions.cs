@@ -192,19 +192,20 @@ public static class ExportExtensions
         this OpenApiDocument document,
         OpenApiSpecVersion version,
         OpenApiFormat format,
-        string filePath)
+        string filePath,
+        string? declaredVersion = null)
     {
         ArgumentNullException.ThrowIfNull(document);
         ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
 
-        using var stream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read);
-        document.SerializeAsync(
-                stream,
+        var content = document.SerializeAsync(
                 version,
                 format.ToStr(),
                 CancellationToken.None)
             .GetAwaiter()
-            .GetResult();
+            .GetResult()
+            .PreserveDeclaredSpecVersion(declaredVersion, format);
+        File.WriteAllText(filePath, content);
     }
 
     public static IEnumerable<KeyValuePair<string, T>> GetComponentsWithType<T>(

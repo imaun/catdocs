@@ -18,6 +18,7 @@ public class OpenApiDocParser
     private OpenApiFormat _format;
     private bool _inlineLocal;
     private bool _inlineExternal;
+    private string? _declaredVersion;
     private long _splitTime;
     private long _bundleTime;
     private long _convertTime;
@@ -69,6 +70,9 @@ public class OpenApiDocParser
         stop_watch.Start();
 
         using var file_stream = new FileStream(_inputFile, FileMode.Open, FileAccess.Read);
+        _declaredVersion = OpenApiExtensions.GetDeclaredSpecVersion(
+            File.ReadAllText(_inputFile),
+            _format);
         var readResult = OpenApiDocument.LoadAsync(
                 file_stream,
                 _format.ToStr(),
@@ -172,7 +176,9 @@ public class OpenApiDocParser
 
         stream.Position = 0;
 
-        return new StreamReader(stream).ReadToEnd();
+        return new StreamReader(stream)
+            .ReadToEnd()
+            .PreserveDeclaredSpecVersion(_declaredVersion, format);
     }
 
     public void Split(string outputDir)
@@ -185,7 +191,12 @@ public class OpenApiDocParser
         var stop_watch = new Stopwatch();
         stop_watch.Start();
 
-        var splitter = new OpenApiDocSplitter(outputDir, _document, _version, _format);
+        var splitter = new OpenApiDocSplitter(
+            outputDir,
+            _document,
+            _version,
+            _format,
+            _declaredVersion);
         splitter.Split();
         
         //TODO: check if has components
@@ -210,7 +221,11 @@ public class OpenApiDocParser
         var builder = new OpenApiDocBuilder(inputDir, _document, _version, _format);
         var new_document = builder.Bundle();
         
-        new_document.SaveDocumentToFile(_version, _format, newDocumentFilename);
+        new_document.SaveDocumentToFile(
+            _version,
+            _format,
+            newDocumentFilename,
+            _declaredVersion);
         
         stop_watch.Stop();
         _bundleTime = stop_watch.ElapsedMilliseconds;

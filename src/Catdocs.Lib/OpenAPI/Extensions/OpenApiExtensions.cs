@@ -1,4 +1,6 @@
 using System.Text;
+using System.Text.Json;
+using System.Text.RegularExpressions;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Reader;
 
@@ -73,6 +75,67 @@ public static class OpenApiExtensions
         };
         settings.AddYamlReader();
         return settings;
+    }
+
+    public static string? GetDeclaredSpecVersion(string content, OpenApiFormat format)
+    {
+        if (format == OpenApiFormat.Json)
+        {
+            try
+            {
+                using var json = JsonDocument.Parse(content);
+                if (json.RootElement.TryGetProperty("openapi", out var openApi))
+                {
+                    return openApi.GetString();
+                }
+
+                if (json.RootElement.TryGetProperty("swagger", out var swagger))
+                {
+                    return swagger.GetString();
+                }
+            }
+            catch (JsonException)
+            {
+                return null;
+            }
+
+            return null;
+        }
+
+        foreach (var line in content.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries))
+        {
+            var trimmed = line.Trim();
+            if (trimmed.StartsWith("openapi:", StringComparison.OrdinalIgnoreCase) ||
+                trimmed.StartsWith("swagger:", StringComparison.OrdinalIgnoreCase))
+            {
+                return trimmed[(trimmed.IndexOf(':') + 1)..].Trim().Trim('\'', '"');
+            }
+        }
+
+        return null;
+    }
+
+    public static string PreserveDeclaredSpecVersion(
+        this string content,
+        string? declaredVersion,
+        OpenApiFormat format)
+    {
+        if (string.IsNullOrWhiteSpace(declaredVersion))
+        {
+            return content;
+        }
+
+        var pattern = format == OpenApiFormat.Json
+            ? "(\"(?:openapi|swagger)\"\\s*:\\s*\")[^\"]+(\"\\s*)"
+            : "(?m)^(\\s*(?:openapi|swagger)\\s*:\\s*)(['\"]?)[^'\"\\r\\n]+(['\"]?\\s*)$";
+        return Regex.Replace(
+            content,
+            pattern,
+            match => format == OpenApiFormat.Json
+                ? $"{match.Groups[1].Value}{declaredVersion}{match.Groups[2].Value}"
+                : $"{match.Groups[1].Value}{match.Groups[2].Value}{declaredVersion}{match.Groups[3].Value}",
+            RegexOptions.None,
+            TimeSpan.FromSeconds(1));
     }
 
     public static void WriteListToConsole(

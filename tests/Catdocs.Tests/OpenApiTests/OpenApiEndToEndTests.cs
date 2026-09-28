@@ -116,6 +116,7 @@ public class OpenApiEndToEndTests
         var splitText = File.ReadAllText(splitMain);
         Assert.Contains("paths/pets.yaml#/paths/~1pets", splitText);
         Assert.Contains("schemas/Pet.yaml#/components/schemas/Pet", splitText);
+        Assert.StartsWith("openapi: 3.0.1", splitText);
         Assert.True(File.Exists(Path.Combine(splitDirectory, "paths", "pets.yaml")));
         Assert.True(File.Exists(Path.Combine(splitDirectory, "schemas", "Pet.yaml")));
 
@@ -140,6 +141,7 @@ public class OpenApiEndToEndTests
             ?? throw new InvalidDataException("Bundled document has no schemas.");
         Assert.Contains("Pet", bundledSchemas.Keys);
         Assert.Contains("#/components/schemas/Pet", bundledText);
+        Assert.StartsWith("openapi: 3.0.1", bundledText);
         Assert.DoesNotContain("schemas/Pet.yaml", bundledText);
         Assert.DoesNotContain("paths/pets.yaml", bundledText);
     }
