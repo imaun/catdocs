@@ -38,15 +38,15 @@ for all API management commands in Redocly, excluding the generation of OpenAPI 
 5. **Version Control**: Use Git to manage changes, enabling team collaboration and maintaining a history of modifications.
 
 ## Getting Started
-You should check if .NET 8 is already installed on your system, you can run the following command in your terminal:
+You should check if the .NET 10 SDK is already installed on your system by running:
 ```bash
 dotnet --version
 ```
 
-If not, for Windows you have to download .NET 8 SDK, for Linux you can run:
+If not, download the .NET 10 SDK for Windows. On Linux, you can run:
 ```bash
 sudo apt-get update && \
-sudo apt-get install -y dotnet-sdk-8.0
+sudo apt-get install -y dotnet-sdk-10.0
 ```
 And for Mac:
 ```bash
@@ -156,7 +156,7 @@ Since Catdocs OpenAPI is built for .NET developers,
 integrating it into your existing .NET applications is seamless.
 After adding the package to your project, you can use it's library in your projects.
 
-To begin using Catdocs OpenAPI in your .NET projects, you can easily install it via NuGet. The tool is packaged as a .NET 8 library, making it straightforward to integrate into your existing applications.
+To begin using Catdocs OpenAPI in your .NET projects, you can easily install it via NuGet. The CLI targets .NET 10, while the reusable Catdocs.OpenApi library remains on .NET 8 for broader consumer compatibility.
 
 You can install the Catdocs.OpenAPI package by running the following command in your project directory:
 

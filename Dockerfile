@@ -1,6 +1,7 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build-env
 WORKDIR /app
 
+COPY src/Catdocs.Lib/*.csproj ./src/Catdocs.Lib/
 COPY src/Catdocs/*.csproj ./src/Catdocs/
 WORKDIR /app/src/Catdocs
 RUN dotnet restore
@@ -10,7 +11,7 @@ COPY . ./
 WORKDIR /app/src/Catdocs
 RUN dotnet publish -c Release -o /app/out
 
-FROM mcr.microsoft.com/dotnet/runtime:8.0
+FROM mcr.microsoft.com/dotnet/runtime:10.0
 WORKDIR /app
 COPY --from=build-env /app/out .
 
