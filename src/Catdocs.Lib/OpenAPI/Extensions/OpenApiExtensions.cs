@@ -1,9 +1,8 @@
-﻿using System.Text;
-using Catdocs.Lib.OpenAPI;
+using System.Text;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Reader;
 
-namespace Catdocs.OpenAPI;
+namespace Catdocs.Lib.OpenAPI.Extensions;
 
 public static class OpenApiExtensions
 {
@@ -64,6 +63,16 @@ public static class OpenApiExtensions
             Constants.SecurityScheme => ReferenceType.SecurityScheme,
             _ => throw new NotSupportedException("OpenAPI type not supported!")
         };
+    }
+
+    public static OpenApiReaderSettings CreateReaderSettings(string filePath)
+    {
+        var settings = new OpenApiReaderSettings
+        {
+            BaseUrl = new Uri(Path.GetFullPath(filePath))
+        };
+        settings.AddYamlReader();
+        return settings;
     }
 
     public static void WriteListToConsole(

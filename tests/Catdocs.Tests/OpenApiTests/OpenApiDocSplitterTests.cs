@@ -1,5 +1,5 @@
 ﻿using Catdocs.Lib.OpenAPI.Internal;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Catdocs.Tests.Common;
 
 namespace Catdocs.Tests.OpenApiTests;
@@ -18,9 +18,5 @@ public class OpenApiDocSplitterTests
         string actualRelativePath = splitter.GetRelativePath(inputFilePath);
 
         Assert.Equal(expectedRelativePath, actualRelativePath);
-    }
-    
-    public void split_simple_oas()
-    {
     }
 }

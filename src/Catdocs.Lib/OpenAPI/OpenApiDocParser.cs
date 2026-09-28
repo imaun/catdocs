@@ -1,8 +1,5 @@
-﻿using Microsoft.OpenApi;
-using Microsoft.OpenApi.Extensions;
-using Microsoft.OpenApi.Models;
-using Microsoft.OpenApi.Readers;
-using Microsoft.OpenApi.Services;
+using Microsoft.OpenApi;
+using Microsoft.OpenApi.Reader;
 using System.Diagnostics;
 using Catdocs.Lib.OpenAPI.Internal;
 using Catdocs.Lib.OpenAPI.Extensions;
@@ -17,7 +14,7 @@ public class OpenApiDocParser
     private bool _hasErrors;
     private List<string> _errors = [];
     private OpenApiSpecVersion _version;
-    private OpenApiDocument _document;
+    private OpenApiDocument _document = null!;
     private OpenApiFormat _format;
     private bool _inlineLocal;
     private bool _inlineExternal;
@@ -71,9 +68,18 @@ public class OpenApiDocParser
         var stop_watch = new Stopwatch();
         stop_watch.Start();
 
-        var reader = new OpenApiStreamReader();
-        using var file_stream = new FileStream(_inputFile, FileMode.Open);
-        _document = reader.Read(file_stream, out var diagnostics);
+        using var file_stream = new FileStream(_inputFile, FileMode.Open, FileAccess.Read);
+        var readResult = OpenApiDocument.LoadAsync(
+                file_stream,
+                _format.ToStr(),
+                OpenApiExtensions.CreateReaderSettings(_inputFile),
+                CancellationToken.None)
+            .GetAwaiter()
+            .GetResult();
+        _document = readResult.Document
+            ?? throw new InvalidDataException($"Unable to parse OpenAPI document '{_inputFile}'.");
+        var diagnostics = readResult.Diagnostic
+            ?? throw new InvalidDataException($"No diagnostics returned for '{_inputFile}'.");
         
         stop_watch.Stop();
         _parseTime = stop_watch.ElapsedMilliseconds;
@@ -150,17 +156,19 @@ public class OpenApiDocParser
             throw new NullReferenceException(nameof(_document));
         }
 
-        var stream = new MemoryStream();
-        
-        _document.Serialize(
-            stream,
-            _version,
-            format,
-            new()
-            {
-                InlineLocalReferences = _inlineLocal,
-                InlineExternalReferences = _inlineExternal
-            });
+        using var stream = new MemoryStream();
+        _document.SerializeAsync(
+                stream,
+                _version,
+                format.ToStr(),
+                new OpenApiWriterSettings
+                {
+                    InlineLocalReferences = _inlineLocal,
+                    InlineExternalReferences = _inlineExternal
+                },
+                CancellationToken.None)
+            .GetAwaiter()
+            .GetResult();
 
         stream.Position = 0;
 
@@ -225,7 +233,8 @@ public class OpenApiDocParser
     internal string GetDirectoryForFilename(string filename)
     {
         var fileInfo = new FileInfo(filename);
-        return fileInfo.DirectoryName;
+        return fileInfo.DirectoryName
+            ?? throw new InvalidOperationException($"Unable to determine directory for '{filename}'.");
     }
     
     internal string GetDocumentFilenameFromPath(string inputPath)

@@ -1,6 +1,6 @@
 ﻿using Microsoft.OpenApi;
 
-namespace Catdocs.OpenAPI.Extensions;
+namespace Catdocs.Lib.OpenAPI.Extensions;
 
 public static class ExportExtensions
 {
@@ -26,47 +26,47 @@ public static class ExportExtensions
 
     public static string GetOpenApiElementTypeName(this Type type)
     {
-        if (type == typeof(OpenApiSchema))
+        if (type == typeof(OpenApiSchema) || type == typeof(IOpenApiSchema))
         {
             return Constants.Schema;
         }
 
-        if (type == typeof(OpenApiParameter))
+        if (type == typeof(OpenApiParameter) || type == typeof(IOpenApiParameter))
         {
             return Constants.Parameter;
         }
 
-        if (type == typeof(OpenApiExample))
+        if (type == typeof(OpenApiExample) || type == typeof(IOpenApiExample))
         {
             return Constants.Example;
         }
 
-        if (type == typeof(OpenApiHeader))
+        if (type == typeof(OpenApiHeader) || type == typeof(IOpenApiHeader))
         {
             return Constants.Header;
         }
 
-        if (type == typeof(OpenApiResponse))
+        if (type == typeof(OpenApiResponse) || type == typeof(IOpenApiResponse))
         {
             return Constants.Response;
         }
 
-        if (type == typeof(OpenApiRequestBody))
+        if (type == typeof(OpenApiRequestBody) || type == typeof(IOpenApiRequestBody))
         {
             return Constants.RequestBody;
         }
 
-        if (type == typeof(OpenApiLink))
+        if (type == typeof(OpenApiLink) || type == typeof(IOpenApiLink))
         {
             return Constants.Link;
         }
 
-        if (type == typeof(OpenApiCallback))
+        if (type == typeof(OpenApiCallback) || type == typeof(IOpenApiCallback))
         {
             return Constants.Callback;
         }
 
-        if (type == typeof(OpenApiSecurityScheme))
+        if (type == typeof(OpenApiSecurityScheme) || type == typeof(IOpenApiSecurityScheme))
         {
             return Constants.SecurityScheme;
         }
@@ -94,47 +94,47 @@ public static class ExportExtensions
 
     public static string GetOpenApiElementDirectoryName(this Type type)
     {
-        if (type == typeof(OpenApiSchema))
+        if (type == typeof(OpenApiSchema) || type == typeof(IOpenApiSchema))
         {
             return Constants.Schema_Dir;
         }
 
-        if (type == typeof(OpenApiParameter))
+        if (type == typeof(OpenApiParameter) || type == typeof(IOpenApiParameter))
         {
             return Constants.Parameter_Dir;
         }
 
-        if (type == typeof(OpenApiExample))
+        if (type == typeof(OpenApiExample) || type == typeof(IOpenApiExample))
         {
             return Constants.Example_Dir;
         }
 
-        if (type == typeof(OpenApiHeader))
+        if (type == typeof(OpenApiHeader) || type == typeof(IOpenApiHeader))
         {
             return Constants.Header_Dir;
         }
 
-        if (type == typeof(OpenApiResponse))
+        if (type == typeof(OpenApiResponse) || type == typeof(IOpenApiResponse))
         {
             return Constants.Response_Dir;
         }
 
-        if (type == typeof(OpenApiRequestBody))
+        if (type == typeof(OpenApiRequestBody) || type == typeof(IOpenApiRequestBody))
         {
             return Constants.RequestBody_Dir;
         }
 
-        if (type == typeof(OpenApiLink))
+        if (type == typeof(OpenApiLink) || type == typeof(IOpenApiLink))
         {
             return Constants.Link_Dir;
         }
 
-        if (type == typeof(OpenApiCallback))
+        if (type == typeof(OpenApiCallback) || type == typeof(IOpenApiCallback))
         {
             return Constants.Callback_Dir;
         }
 
-        if (type == typeof(OpenApiSecurityScheme))
+        if (type == typeof(OpenApiSecurityScheme) || type == typeof(IOpenApiSecurityScheme))
         {
             return Constants.SecurityScheme_Dir;
         }
@@ -188,6 +188,25 @@ public static class ExportExtensions
         return await new StreamReader(stream).ReadToEndAsync(cancellationToken).ConfigureAwait(false);
     }
 
+    public static void SaveDocumentToFile(
+        this OpenApiDocument document,
+        OpenApiSpecVersion version,
+        OpenApiFormat format,
+        string filePath)
+    {
+        ArgumentNullException.ThrowIfNull(document);
+        ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
+
+        using var stream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read);
+        document.SerializeAsync(
+                stream,
+                version,
+                format.ToStr(),
+                CancellationToken.None)
+            .GetAwaiter()
+            .GetResult();
+    }
+
     public static IEnumerable<KeyValuePair<string, T>> GetComponentsWithType<T>(
         this OpenApiDocument document, string elementType) where T : IOpenApiReferenceable
     {
@@ -196,21 +215,21 @@ public static class ExportExtensions
         switch (elementType)
         {
             case Constants.Schema:
-                return document.Components.Schemas.Cast<KeyValuePair<string, T>>();
+                return document.Components?.Schemas?.Cast<KeyValuePair<string, T>>() ?? [];
             case Constants.Callback:
-                return document.Components.Callbacks.Cast<KeyValuePair<string, T>>();
+                return document.Components?.Callbacks?.Cast<KeyValuePair<string, T>>() ?? [];
             case Constants.Parameter:
-                return document.Components.Parameters.Cast<KeyValuePair<string, T>>();
+                return document.Components?.Parameters?.Cast<KeyValuePair<string, T>>() ?? [];
             case Constants.Example:
-                return document.Components.Examples.Cast<KeyValuePair<string, T>>();
+                return document.Components?.Examples?.Cast<KeyValuePair<string, T>>() ?? [];
             case Constants.Header:
-                return document.Components.Headers.Cast<KeyValuePair<string, T>>();
+                return document.Components?.Headers?.Cast<KeyValuePair<string, T>>() ?? [];
             case Constants.Link:
-                return document.Components.Links.Cast<KeyValuePair<string, T>>();
+                return document.Components?.Links?.Cast<KeyValuePair<string, T>>() ?? [];
             case Constants.Response:
-                return document.Components.Responses.Cast<KeyValuePair<string, T>>();
+                return document.Components?.Responses?.Cast<KeyValuePair<string, T>>() ?? [];
             case Constants.RequestBody:
-                return document.Components.RequestBodies.Cast<KeyValuePair<string, T>>();
+                return document.Components?.RequestBodies?.Cast<KeyValuePair<string, T>>() ?? [];
 
             default:
                 throw new ArgumentException($"OpenAPI type `{elementType}` not supported!");
@@ -257,14 +276,12 @@ public static class ExportExtensions
         ArgumentException.ThrowIfNullOrEmpty(key, nameof(key));
         ArgumentException.ThrowIfNullOrEmpty(filePath, nameof(filePath));
 
-        var referenceId = ExtractReferenceId(key, filePath);
-
         switch (elementTypeName)
         {
             case Constants.Schema:
                 components.Schemas ??= new Dictionary<string, IOpenApiSchema>();
                 components.Schemas[key] = new OpenApiSchemaReference(
-                    referenceId: referenceId,
+                    referenceId: key,
                     hostDocument: null,
                     externalResource: filePath);
                 break;
@@ -272,7 +289,7 @@ public static class ExportExtensions
             case Constants.Parameter:
                 components.Parameters ??= new Dictionary<string, IOpenApiParameter>();
                 components.Parameters[key] = new OpenApiParameterReference(
-                    referenceId: referenceId,
+                    referenceId: key,
                     hostDocument: null,
                     externalResource: filePath);
                 break;
@@ -280,7 +297,7 @@ public static class ExportExtensions
             case Constants.Callback:
                 components.Callbacks ??= new Dictionary<string, IOpenApiCallback>();
                 components.Callbacks[key] = new OpenApiCallbackReference(
-                    referenceId: referenceId,
+                    referenceId: key,
                     hostDocument: null,
                     externalResource: filePath);
                 break;
@@ -288,7 +305,7 @@ public static class ExportExtensions
             case Constants.Example:
                 components.Examples ??= new Dictionary<string, IOpenApiExample>();
                 components.Examples[key] = new OpenApiExampleReference(
-                    referenceId: referenceId,
+                    referenceId: key,
                     hostDocument: null,
                     externalResource: filePath);
                 break;
@@ -296,7 +313,7 @@ public static class ExportExtensions
             case Constants.Header:
                 components.Headers ??= new Dictionary<string, IOpenApiHeader>();
                 components.Headers[key] = new OpenApiHeaderReference(
-                    referenceId: referenceId,
+                    referenceId: key,
                     hostDocument: null,
                     externalResource: filePath);
                 break;
@@ -304,7 +321,7 @@ public static class ExportExtensions
             case Constants.Link:
                 components.Links ??= new Dictionary<string, IOpenApiLink>();
                 components.Links[key] = new OpenApiLinkReference(
-                    referenceId: referenceId,
+                    referenceId: key,
                     hostDocument: null,
                     externalResource: filePath);
                 break;
@@ -312,7 +329,7 @@ public static class ExportExtensions
             case Constants.Response:
                 components.Responses ??= new Dictionary<string, IOpenApiResponse>();
                 components.Responses[key] = new OpenApiResponseReference(
-                    referenceId: referenceId,
+                    referenceId: key,
                     hostDocument: null,
                     externalResource: filePath);
                 break;
@@ -320,7 +337,7 @@ public static class ExportExtensions
             case Constants.RequestBody:
                 components.RequestBodies ??= new Dictionary<string, IOpenApiRequestBody>();
                 components.RequestBodies[key] = new OpenApiRequestBodyReference(
-                    referenceId: referenceId,
+                    referenceId: key,
                     hostDocument: null,
                     externalResource: filePath);
                 break;
@@ -330,14 +347,4 @@ public static class ExportExtensions
         }
     }
     
-    private static string ExtractReferenceId(string fallbackId, string filePath)
-    {
-        // Examples:
-        //  "../schemas/pet.yaml#/components/schemas/Pet" -> "components/schemas/Pet"
-        //  "../components.yaml#/components/parameters/ApiKeyHeader" -> "components/parameters/ApiKeyHeader"
-        var idx = filePath.IndexOf("#/", StringComparison.Ordinal);
-        if (idx >= 0 && idx + 2 < filePath.Length)
-            return filePath[(idx + 2)..];
-        return fallbackId;
-    }
 }

@@ -1,4 +1,4 @@
-namespace Catdocs.OpenAPI;
+namespace Catdocs.Lib.OpenAPI;
 
 public enum OpenApiFormat
 {

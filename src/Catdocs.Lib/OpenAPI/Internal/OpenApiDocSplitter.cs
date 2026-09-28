@@ -1,7 +1,5 @@
-﻿using Catdocs.Lib.OpenAPI.Extensions;
 using Microsoft.OpenApi;
-using Microsoft.OpenApi.Interfaces;
-using Microsoft.OpenApi.Models;
+using Catdocs.Lib.OpenAPI.Extensions;
 
 namespace Catdocs.Lib.OpenAPI.Internal;
 
@@ -9,9 +7,9 @@ internal class OpenApiDocSplitter
 {
     private OpenApiDocument _document;
     private string _outputDir;
-    private long _splitTime;
     private OpenApiFormat _format;
     private OpenApiSpecVersion _version;
+    private readonly Dictionary<string, string> _pathReferenceReplacements = [];
 
     public OpenApiDocSplitter(
         string outputDir,
@@ -39,7 +37,7 @@ internal class OpenApiDocSplitter
             return;
         }
         
-        var paths_dir = Path.Combine(_outputDir, OpenApiConstants.Path_Dir);
+        var paths_dir = Path.Combine(_outputDir, Constants.Path_Dir);
         CreateDirIfNotExists(paths_dir);
         
         var paths = _document.Paths;
@@ -60,19 +58,17 @@ internal class OpenApiDocSplitter
                 
                 temp_document.Paths.Add(path.Key, path.Value);
                 temp_document.SaveDocumentToFile(_version, _format, filename);
-                
-                // var content = path.Value.SerializeElement(_version, _format);
-                // SaveToFile(filename, content);
-                
-                _document.Paths.Add(path.Key, new OpenApiPathItem
-                {
-                    Reference = new OpenApiReference
-                    {
-                        Id = path.Key,
-                        Type = OpenApiConstants.Path.GetOpenApiReferenceType(),
-                        ExternalResource = GetRelativePath(filename)
-                    }
-                });
+
+                var referenceId = GetNormalizedOpenApiPathFilename(path.Key);
+                var relativePath = GetRelativePath(filename);
+                var pathReference = new OpenApiPathItemReference(
+                    referenceId,
+                    _document,
+                    relativePath);
+                _pathReferenceReplacements[
+                    $"{relativePath}#/components/pathItems/{referenceId}"] =
+                    $"{relativePath}#/paths/{EscapeJsonPointer(path.Key)}";
+                _document.Paths.Add(path.Key, pathReference);
             }
             catch (Exception ex)
             {
@@ -89,7 +85,18 @@ internal class OpenApiDocSplitter
         ExportComponents();
         
         var documentFilename = $"{_outputDir}{Path.DirectorySeparatorChar}OpenApi.{_format.GetFormatFileExtension()}";
-        _document.SaveDocumentToFile(_version, _format, documentFilename);
+        var documentContent = _document
+            .SerializeDocumentAsync(_version, _format)
+            .GetAwaiter()
+            .GetResult();
+        foreach (var replacement in _pathReferenceReplacements)
+        {
+            documentContent = documentContent.Replace(
+                replacement.Key,
+                replacement.Value,
+                StringComparison.Ordinal);
+        }
+        File.WriteAllText(documentFilename, documentContent);
         SpecLogger.Log($"Main document created at : {documentFilename}");
     }
     
@@ -102,14 +109,13 @@ internal class OpenApiDocSplitter
         ExportLinks();
         ExportResponses();
         ExportRequestBodies();
-        ExportLinks();
         ExportExamples();
         //ExportSecuritySchemes();
     }
 
     private void ExportSchemas()
     {
-        if (!_document.Components.Schemas.Any())
+        if (_document.Components?.Schemas?.Any() != true)
         {
             SpecLogger.Log("No Schema found!");
             return;
@@ -120,7 +126,7 @@ internal class OpenApiDocSplitter
 
     private void ExportParameters()
     {
-        if (!_document.Components.Parameters.Any())
+        if (_document.Components?.Parameters?.Any() != true)
         {
             SpecLogger.Log("No Parameters found!");
             return;
@@ -131,7 +137,7 @@ internal class OpenApiDocSplitter
 
     private void ExportExamples()
     {
-        if (!_document.Components.Examples.Any())
+        if (_document.Components?.Examples?.Any() != true)
         {
             SpecLogger.Log("No Examples found!");
             return;
@@ -142,7 +148,7 @@ internal class OpenApiDocSplitter
 
     private void ExportSecuritySchemes()
     {
-        if (!_document.Components.SecuritySchemes.Any())
+        if (_document.Components?.SecuritySchemes?.Any() != true)
         {
             SpecLogger.Log("No SecuritySchemes found!");
             return;
@@ -153,7 +159,7 @@ internal class OpenApiDocSplitter
 
     private void ExportHeaders()
     {
-        if (!_document.Components.Headers.Any())
+        if (_document.Components?.Headers?.Any() != true)
         {
             SpecLogger.Log("No Headers found!");
             return;
@@ -164,7 +170,7 @@ internal class OpenApiDocSplitter
 
     private void ExportResponses()
     {
-        if (!_document.Components.Responses.Any())
+        if (_document.Components?.Responses?.Any() != true)
         {
             SpecLogger.Log("No Response found!");
             return;
@@ -175,7 +181,7 @@ internal class OpenApiDocSplitter
 
     private void ExportLinks()
     {
-        if (!_document.Components.Links.Any())
+        if (_document.Components?.Links?.Any() != true)
         {
             SpecLogger.Log("No Links found!");
             return;
@@ -186,7 +192,7 @@ internal class OpenApiDocSplitter
 
     private void ExportCallbacks()
     {
-        if (!_document.Components.Callbacks.Any())
+        if (_document.Components?.Callbacks?.Any() != true)
         {
             SpecLogger.Log("No Callbacks found!");
             return;
@@ -197,7 +203,7 @@ internal class OpenApiDocSplitter
 
     private void ExportRequestBodies()
     {
-        if (!_document.Components.RequestBodies.Any())
+        if (_document.Components?.RequestBodies?.Any() != true)
         {
             SpecLogger.Log("No RequestBody found!");
             return;
@@ -210,6 +216,7 @@ internal class OpenApiDocSplitter
     {
         string elementTypeName = typeof(T).GetOpenApiElementTypeName();
         string dir = Path.Combine(_outputDir, typeof(T).GetOpenApiElementDirectoryName());
+        var exportedElements = new List<(string Key, string FilePath)>();
         
         CreateDirIfNotExists(dir);
         
@@ -224,51 +231,14 @@ internal class OpenApiDocSplitter
                     Components = new OpenApiComponents()
                 };
 
-                switch (elementTypeName)
+                if (!temp_document.AddComponent(el.Key, el.Value))
                 {
-                    case OpenApiConstants.Schema:
-                        temp_document.Components.Schemas.Add(el.Key, el.Value as OpenApiSchema);
-                        break;
-                    
-                    case OpenApiConstants.Example:
-                        temp_document.Components.Examples.Add(el.Key, el.Value as OpenApiExample);
-                        break;
-                    
-                    case OpenApiConstants.Callback:
-                        temp_document.Components.Callbacks.Add(el.Key, el.Value as OpenApiCallback);
-                        break;
-                    
-                    case OpenApiConstants.Header:
-                        temp_document.Components.Headers.Add(el.Key, el.Value as OpenApiHeader);
-                        break;
-                    
-                    case OpenApiConstants.Link:
-                        temp_document.Components.Links.Add(el.Key, el.Value as OpenApiLink);
-                        break;
-                    
-                    case OpenApiConstants.Response:
-                        temp_document.Components.Responses.Add(el.Key, el.Value as OpenApiResponse);
-                        break;
-                    
-                    case OpenApiConstants.RequestBody:
-                        temp_document.Components.RequestBodies.Add(el.Key, el.Value as OpenApiRequestBody);
-                        break;
-                    
-                    case OpenApiConstants.Parameter:
-                        temp_document.Components.Parameters.Add(el.Key, el.Value as OpenApiParameter);
-                        break;
-                    
-                    case OpenApiConstants.SecurityScheme:
-                        temp_document.Components.SecuritySchemes.Add(el.Key, el.Value as OpenApiSecurityScheme);
-                        break;
+                    throw new InvalidOperationException(
+                        $"Unable to add {elementTypeName} component '{el.Key}'.");
                 }
 
                 temp_document.SaveDocumentToFile(_version, _format, filename);
-                
-                //var content = el.Value.SerializeElement(_version, _format);
-                //SaveToFile(filename, content);
-
-                //_document.Components.AddExternalReferenceFor(elementTypeName, el.Key, filename);
+                exportedElements.Add((el.Key, filename));
             }
             catch (Exception ex)
             {
@@ -280,7 +250,17 @@ internal class OpenApiDocSplitter
             }
         }
         
-        _document.Components.DeleteAllElementsOfType(elementTypeName);
+        var components = _document.Components
+            ?? throw new InvalidOperationException("The OpenAPI document has no components collection.");
+        components.DeleteAllElementsOfType(elementTypeName);
+
+        foreach (var exportedElement in exportedElements)
+        {
+            components.AddExternalReferenceFor(
+                elementTypeName,
+                exportedElement.Key,
+                GetRelativePath(exportedElement.FilePath));
+        }
         
         SpecLogger.Log($"Export {elementTypeName} finished.");
     }
@@ -295,7 +275,10 @@ internal class OpenApiDocSplitter
 
         return path.TrimStart('/').Replace('/', '_');
     }
-    
+
+    private static string EscapeJsonPointer(string value)
+        => value.Replace("~", "~0").Replace("/", "~1");
+
     private static void CreateDirIfNotExists(string path)
     {
         if (string.IsNullOrWhiteSpace(path))

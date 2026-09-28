@@ -1,6 +1,8 @@
-﻿using Microsoft.OpenApi;
+﻿using Catdocs.Lib.OpenAPI.Extensions;
+using Microsoft.OpenApi;
+using Microsoft.OpenApi.Reader;
 
-namespace Catdocs.OpenAPI.Internal;
+namespace Catdocs.Lib.OpenAPI.Internal;
 
 internal class OpenApiDocBuilder
 {
@@ -30,15 +32,16 @@ internal class OpenApiDocBuilder
         var api_paths = new OpenApiPaths();
         foreach (var path in _document.Paths)
         {
-            if (path.Value is not null)
-            {   
-                var pathRef = path.Value.Reference.ExternalResource;
-                var filePath = Path.Combine(_inputDir, pathRef);
+            if (path.Value is OpenApiPathItemReference reference)
+            {
+                var pathRef = reference.Reference.ReferenceV3;
+                ArgumentException.ThrowIfNullOrWhiteSpace(pathRef);
+                var filePath = Path.Combine(_inputDir, pathRef.Split('#', 2)[0]);
                 var pathDoc = LoadApiPathDocument(Path.GetFullPath(filePath));
-                foreach (var resolvedPath in pathDoc.Paths)
-                {
-                    api_paths.Add(resolvedPath.Key, resolvedPath.Value as OpenApiPathItem);
-                }
+                var resolvedPath = pathDoc.Paths?.Values.SingleOrDefault()
+                    ?? throw new InvalidDataException(
+                        $"No path item found in referenced file '{filePath}'.");
+                api_paths.Add(path.Key, resolvedPath);
             }
             else
             {
@@ -65,27 +68,28 @@ internal class OpenApiDocBuilder
 
     internal OpenApiDocument LoadApiPathDocument(string filePath)
     {
-        var reader = new OpenApiStreamReader(new OpenApiReaderSettings
-        {
-            ReferenceResolution = ReferenceResolutionSetting.DoNotResolveReferences,
-        });
-        
         using var file_stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-        var doc = reader.Read(file_stream, out var diagnostic);
-
-        return doc;
+        var result = OpenApiDocument.LoadAsync(
+                file_stream,
+                _format.ToStr(),
+                OpenApiExtensions.CreateReaderSettings(filePath),
+                CancellationToken.None)
+            .GetAwaiter()
+            .GetResult();
+        return result.Document
+            ?? throw new InvalidDataException($"Unable to parse referenced document '{filePath}'.");
     }
 
     internal async Task<OpenApiDocument> LoadApiPathDocumentAsync(string filePath, CancellationToken cancellationToken = default)
     {
-        var reader = new OpenApiStreamReader(new OpenApiReaderSettings
-        {
-            ReferenceResolution = ReferenceResolutionSetting.DoNotResolveReferences,
-        });
-        
         using var file_stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-        var doc = await reader.ReadAsync(file_stream, cancellationToken).ConfigureAwait(false);
-        return doc.OpenApiDocument;
+        var result = await OpenApiDocument.LoadAsync(
+            file_stream,
+            _format.ToStr(),
+            OpenApiExtensions.CreateReaderSettings(filePath),
+            cancellationToken).ConfigureAwait(false);
+        return result.Document
+            ?? throw new InvalidDataException($"Unable to parse referenced document '{filePath}'.");
     }
 
     internal Dictionary<string, T> ResolveReferences<T>() where T: IOpenApiReferenceable

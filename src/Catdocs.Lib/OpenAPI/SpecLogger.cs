@@ -5,7 +5,7 @@ namespace Catdocs.Lib.OpenAPI;
 public static class SpecLogger
 {
     
-    public static string Filename { get; private set; }
+    public static string Filename { get; private set; } = string.Empty;
     
     public static bool WriteToConsole { get; private set; }
     

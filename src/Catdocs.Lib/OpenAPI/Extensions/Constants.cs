@@ -1,4 +1,4 @@
-﻿namespace Catdocs.OpenAPI;
+﻿namespace Catdocs.Lib.OpenAPI.Extensions;
 
 internal static class Constants
 {
