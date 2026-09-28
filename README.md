@@ -66,7 +66,7 @@ dotnet build
 You can now run Catdocs using the dotnet run command followed by the specific command you wish to use. For example, to get statistics of an OpenAPI document:
 
 ```bash
-dotnet run -- stats --file path/to/your/openapi.yaml --format yaml
+dotnet run --project src/Catdocs/Catdocs.csproj -- --file examples/bundle-pipeline/output.yaml --spec-ver 3 --format yaml
 ```
 
 ## Install it with Docker
@@ -161,10 +161,11 @@ To begin using Catdocs OpenAPI in your .NET projects, you can easily install it 
 You can install the Catdocs.OpenAPI package by running the following command in your project directory:
 
 ```bash
-dotnet add package Catdocs.OpenAPI
+dotnet add package Catdocs.OpenAPI --version 1.0.0
 ```
 This command will download and add the Catdocs.OpenAPI package to your project, allowing you to utilize its features directly within your .NET environment.
 
+Catdocs.OpenApi 1.0.0 uses Microsoft.OpenApi 3.x. Because the library's public API exposes Microsoft.OpenApi document and enum types, upgrading from Catdocs.OpenApi 0.6 requires consumers to update code that used the previous Microsoft.OpenApi model namespaces and concrete collection types.
 
 or integrate it into your build and CI/CD pipelines.
 This integration ensures that your API management processes are tightly coupled with your development workflow, enhancing efficiency and reliability.

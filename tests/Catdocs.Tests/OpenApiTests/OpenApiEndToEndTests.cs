@@ -88,8 +88,11 @@ public class OpenApiEndToEndTests
 
         Assert.True(roundTrip.Success);
         Assert.Contains("/pets", roundTrip.Document.Paths.Keys);
-        Assert.NotNull(roundTrip.Document.Components);
-        Assert.Contains("Pet", roundTrip.Document.Components.Schemas.Keys);
+        var roundTripComponents = roundTrip.Document.Components
+            ?? throw new InvalidDataException("Converted document has no components.");
+        var roundTripSchemas = roundTripComponents.Schemas
+            ?? throw new InvalidDataException("Converted document has no schemas.");
+        Assert.Contains("Pet", roundTripSchemas.Keys);
     }
 
     [Fact]
@@ -131,8 +134,11 @@ public class OpenApiEndToEndTests
 
         Assert.True(bundled.Success);
         Assert.Contains("/pets", bundled.Document.Paths.Keys);
-        Assert.NotNull(bundled.Document.Components);
-        Assert.Contains("Pet", bundled.Document.Components.Schemas.Keys);
+        var bundledComponents = bundled.Document.Components
+            ?? throw new InvalidDataException("Bundled document has no components.");
+        var bundledSchemas = bundledComponents.Schemas
+            ?? throw new InvalidDataException("Bundled document has no schemas.");
+        Assert.Contains("Pet", bundledSchemas.Keys);
         Assert.Contains("#/components/schemas/Pet", bundledText);
         Assert.DoesNotContain("schemas/Pet.yaml", bundledText);
         Assert.DoesNotContain("paths/pets.yaml", bundledText);
@@ -161,8 +167,11 @@ public class OpenApiEndToEndTests
 
         Assert.True(result.Success);
         Assert.Equal(3, result.Document.Paths.Count);
-        Assert.NotNull(result.Document.Components);
-        Assert.Contains("Pet", result.Document.Components.Schemas.Keys);
+        var components = result.Document.Components
+            ?? throw new InvalidDataException("Pipeline output has no components.");
+        var schemas = components.Schemas
+            ?? throw new InvalidDataException("Pipeline output has no schemas.");
+        Assert.Contains("Pet", schemas.Keys);
     }
 
     private static string GetValidDocument(OpenApiSpecVersion version, OpenApiFormat format)
