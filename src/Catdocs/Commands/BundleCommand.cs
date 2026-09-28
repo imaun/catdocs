@@ -1,5 +1,6 @@
 using System.CommandLine;
 using Catdocs.Lib.OpenAPI;
+using Catdocs.Lib.OpenAPI.Extensions;
 using Microsoft.OpenApi;
 
 namespace Catdocs.Commands;
