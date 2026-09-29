@@ -42,7 +42,7 @@ public static class BundleCommand
     }
 
 
-    private static void Run(FileInfo file, string version, string format, string outputFile)
+    private static async Task Run(FileInfo file, string version, string format, string outputFile)
     {
         if (file is null)
         {
@@ -118,7 +118,7 @@ public static class BundleCommand
         var parser = new OpenApiDocParser(
             file.FullName, spec_version, spec_format, true, true);
 
-        var parse_result = parser.Load();
+        var parse_result = await parser.LoadAsync();
         if (parse_result.HasErrors)
         {
             ConsoleExtensions.WriteErrorLine("🩻 Found some errors: ");
@@ -127,7 +127,7 @@ public static class BundleCommand
             return;
         }
 
-        parser.Bundle(outputFile);
+        await parser.BundleAsync(outputFile);
         Console.WriteLine($"Build took: {parser.BundleTime} ms");
     }
 }

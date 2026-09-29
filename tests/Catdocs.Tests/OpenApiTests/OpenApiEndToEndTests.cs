@@ -10,7 +10,7 @@ public class OpenApiEndToEndTests
     [InlineData(OpenApiSpecVersion.OpenApi2_0, OpenApiFormat.Json)]
     [InlineData(OpenApiSpecVersion.OpenApi3_0, OpenApiFormat.Yaml)]
     [InlineData(OpenApiSpecVersion.OpenApi3_0, OpenApiFormat.Json)]
-    public void Parse_valid_documents_from_temporary_directories(
+    public async Task Parse_valid_documents_from_temporary_directories(
         OpenApiSpecVersion version,
         OpenApiFormat format)
     {
@@ -19,7 +19,7 @@ public class OpenApiEndToEndTests
             $"valid.{GetExtension(format)}",
             GetValidDocument(version, format));
 
-        var result = new OpenApiDocParser(input, version, format).Load();
+        var result = await new OpenApiDocParser(input, version, format).LoadAsync();
 
         Assert.True(result.Success);
         Assert.Empty(result.Errors);
@@ -29,7 +29,7 @@ public class OpenApiEndToEndTests
     [Theory]
     [InlineData(OpenApiFormat.Yaml)]
     [InlineData(OpenApiFormat.Json)]
-    public void Parse_invalid_documents_reports_diagnostics(OpenApiFormat format)
+    public async Task Parse_invalid_documents_reports_diagnostics(OpenApiFormat format)
     {
         using var temp = new TemporaryDirectory();
         var input = temp.WriteFile(
@@ -48,17 +48,17 @@ public class OpenApiEndToEndTests
                           '200': { }
                   """);
 
-        var result = new OpenApiDocParser(
+        var result = await new OpenApiDocParser(
             input,
             OpenApiSpecVersion.OpenApi3_0,
-            format).Load();
+            format).LoadAsync();
 
         Assert.False(result.Success);
         Assert.NotEmpty(result.Errors);
     }
 
     [Fact]
-    public void Convert_json_to_yaml_and_back_preserves_the_document()
+    public async Task Convert_json_to_yaml_and_back_preserves_the_document()
     {
         using var temp = new TemporaryDirectory();
         var json = temp.WriteFile(
@@ -71,20 +71,20 @@ public class OpenApiEndToEndTests
             json,
             OpenApiSpecVersion.OpenApi3_0,
             OpenApiFormat.Json);
-        Assert.True(jsonParser.Load().Success);
-        jsonParser.ConvertTo(OpenApiFormat.Yaml, yaml);
+        Assert.True((await jsonParser.LoadAsync()).Success);
+        await jsonParser.ConvertToAsync(OpenApiFormat.Yaml, yaml);
 
         var yamlParser = new OpenApiDocParser(
             yaml,
             OpenApiSpecVersion.OpenApi3_0,
             OpenApiFormat.Yaml);
-        Assert.True(yamlParser.Load().Success);
-        yamlParser.ConvertTo(OpenApiFormat.Json, roundTripJson);
+        Assert.True((await yamlParser.LoadAsync()).Success);
+        await yamlParser.ConvertToAsync(OpenApiFormat.Json, roundTripJson);
 
-        var roundTrip = new OpenApiDocParser(
+        var roundTrip = await new OpenApiDocParser(
             roundTripJson,
             OpenApiSpecVersion.OpenApi3_0,
-            OpenApiFormat.Json).Load();
+            OpenApiFormat.Json).LoadAsync();
 
         Assert.True(roundTrip.Success);
         Assert.Contains("/pets", roundTrip.Document.Paths.Keys);
@@ -96,7 +96,7 @@ public class OpenApiEndToEndTests
     }
 
     [Fact]
-    public void Split_bundle_and_validate_preserves_paths_components_and_references()
+    public async Task Split_bundle_and_validate_preserves_paths_components_and_references()
     {
         using var temp = new TemporaryDirectory();
         var source = temp.WriteFile(
@@ -109,11 +109,11 @@ public class OpenApiEndToEndTests
             source,
             OpenApiSpecVersion.OpenApi3_0,
             OpenApiFormat.Yaml);
-        Assert.True(sourceParser.Load().Success);
-        sourceParser.Split(splitDirectory);
+        Assert.True((await sourceParser.LoadAsync()).Success);
+        await sourceParser.SplitAsync(splitDirectory);
 
         var splitMain = Path.Combine(splitDirectory, "OpenApi.yaml");
-        var splitText = File.ReadAllText(splitMain);
+        var splitText = await File.ReadAllTextAsync(splitMain);
         Assert.Contains("paths/pets.yaml#/paths/~1pets", splitText);
         Assert.Contains("schemas/Pet.yaml#/components/schemas/Pet", splitText);
         Assert.StartsWith("openapi: 3.0.1", splitText);
@@ -124,14 +124,14 @@ public class OpenApiEndToEndTests
             splitMain,
             OpenApiSpecVersion.OpenApi3_0,
             OpenApiFormat.Yaml);
-        Assert.True(splitParser.Load().Success);
-        splitParser.Bundle(bundledFile);
+        Assert.True((await splitParser.LoadAsync()).Success);
+        await splitParser.BundleAsync(bundledFile);
 
-        var bundled = new OpenApiDocParser(
+        var bundled = await new OpenApiDocParser(
             bundledFile,
             OpenApiSpecVersion.OpenApi3_0,
-            OpenApiFormat.Yaml).Load();
-        var bundledText = File.ReadAllText(bundledFile);
+            OpenApiFormat.Yaml).LoadAsync();
+        var bundledText = await File.ReadAllTextAsync(bundledFile);
 
         Assert.True(bundled.Success);
         Assert.Contains("/pets", bundled.Document.Paths.Keys);
@@ -147,7 +147,7 @@ public class OpenApiEndToEndTests
     }
 
     [Fact]
-    public void Repository_example_pipeline_bundles_and_validates()
+    public async Task Repository_example_pipeline_bundles_and_validates()
     {
         using var temp = new TemporaryDirectory();
         var exampleDirectory = FindRepositoryPath("examples", "bundle-pipeline");
@@ -159,13 +159,13 @@ public class OpenApiEndToEndTests
             input,
             OpenApiSpecVersion.OpenApi3_0,
             OpenApiFormat.Yaml);
-        Assert.True(parser.Load().Success);
-        parser.Bundle(output);
+        Assert.True((await parser.LoadAsync()).Success);
+        await parser.BundleAsync(output);
 
-        var result = new OpenApiDocParser(
+        var result = await new OpenApiDocParser(
             output,
             OpenApiSpecVersion.OpenApi3_0,
-            OpenApiFormat.Yaml).Load();
+            OpenApiFormat.Yaml).LoadAsync();
 
         Assert.True(result.Success);
         Assert.Equal(3, result.Document.Paths.Count);

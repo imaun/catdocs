@@ -187,25 +187,24 @@ public static class ExportExtensions
 
         return await new StreamReader(stream).ReadToEndAsync(cancellationToken).ConfigureAwait(false);
     }
-
-    public static void SaveDocumentToFile(
+    public static async Task SaveDocumentToFileAsync(
         this OpenApiDocument document,
         OpenApiSpecVersion version,
         OpenApiFormat format,
         string filePath,
-        string? declaredVersion = null)
+        string? declaredVersion = null,
+        CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(document);
         ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
 
-        var content = document.SerializeAsync(
+        var content = (await document.SerializeAsync(
                 version,
                 format.ToStr(),
-                CancellationToken.None)
-            .GetAwaiter()
-            .GetResult()
+                cancellationToken)
+            .ConfigureAwait(false))
             .PreserveDeclaredSpecVersion(declaredVersion, format);
-        File.WriteAllText(filePath, content);
+        await File.WriteAllTextAsync(filePath, content, cancellationToken).ConfigureAwait(false);
     }
 
     public static IEnumerable<KeyValuePair<string, T>> GetComponentsWithType<T>(

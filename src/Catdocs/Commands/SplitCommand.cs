@@ -40,7 +40,7 @@ public static class SplitCommand
         return _command;
     }
 
-    public static void Run(FileInfo file, string version, string format, string outputDir)
+    public static async Task Run(FileInfo file, string version, string format, string outputDir)
     {
         if (file is null)
         {
@@ -88,7 +88,7 @@ public static class SplitCommand
         var parser = new OpenApiDocParser(
             file.FullName, spec_version, spec_format, true, true);
         
-        var parse_result = parser.Load();
+        var parse_result = await parser.LoadAsync();
         if (parse_result.HasErrors)
         {
             ConsoleExtensions.WriteErrorLine("🩻 Found some errors: ");
@@ -97,7 +97,7 @@ public static class SplitCommand
             return;
         }
 
-        parser.Split(outputDir);
+        await parser.SplitAsync(outputDir);
         Console.WriteLine($"Split took : {parser.SplitTime} ms");
     }
 }

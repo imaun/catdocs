@@ -44,7 +44,7 @@ public static class ConvertCommand
         return _command;
     }
 
-    private static void Run(FileInfo file, string version, string format, string outputFile)
+    private static async Task Run(FileInfo file, string version, string format, string outputFile)
     {
         if (file is null)
         {
@@ -95,7 +95,7 @@ public static class ConvertCommand
         var parser = new OpenApiDocParser(
             file.FullName, spec_version, spec_format, false, false);
 
-        var parse_result = parser.Load();
+        var parse_result = await parser.LoadAsync();
         if (parse_result.HasErrors)
         {
             ConsoleExtensions.WriteErrorLine("🩻 Found some errors: ");
@@ -104,7 +104,7 @@ public static class ConvertCommand
             return;
         }
         
-        parser.ConvertTo(target_format, outputFile);
+        await parser.ConvertToAsync(target_format, outputFile);
         Console.WriteLine($"Convert took: {parser.BundleTime} ms");
     }
 }

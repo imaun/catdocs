@@ -38,7 +38,7 @@ public static class MainCommand
         await _command.InvokeAsync(args);
     }
 
-    private static void Run(FileInfo file, string version, string format)
+    private static async Task Run(FileInfo file, string version, string format)
     {
         if (file is null)
         {
@@ -86,7 +86,7 @@ public static class MainCommand
         var parser = new OpenApiDocParser(
             file.FullName, spec_version, spec_format, true, true);
 
-        var parse_result = parser.Load();
+        var parse_result = await parser.LoadAsync();
         if (parse_result.HasErrors)
         {
             ConsoleExtensions.WriteErrorLine("🩻 Found some errors: ");

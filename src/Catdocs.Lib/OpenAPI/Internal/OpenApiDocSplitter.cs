@@ -32,7 +32,7 @@ internal class OpenApiDocSplitter
     }
 
 
-    public void Split()
+    public async Task SplitAsync(CancellationToken cancellationToken = default)
     {
         if (!_document.Paths.Any())
         {
@@ -60,11 +60,12 @@ internal class OpenApiDocSplitter
                 };
                 
                 temp_document.Paths.Add(path.Key, path.Value);
-                temp_document.SaveDocumentToFile(
+                await temp_document.SaveDocumentToFileAsync(
                     _version,
                     _format,
                     filename,
-                    _declaredVersion);
+                    _declaredVersion,
+                    cancellationToken).ConfigureAwait(false);
 
                 var referenceId = GetNormalizedOpenApiPathFilename(path.Key);
                 var relativePath = GetRelativePath(filename);
@@ -79,7 +80,7 @@ internal class OpenApiDocSplitter
             }
             catch (Exception ex)
             {
-                SpecLogger.Log($"{nameof(Split)} Exception: {ex.GetBaseException().Message}");
+                SpecLogger.Log($"{nameof(SplitAsync)} Exception: {ex.GetBaseException().Message}");
             }
             finally
             {
@@ -89,13 +90,12 @@ internal class OpenApiDocSplitter
         
         SpecLogger.Log("Export API Paths finished.");
         
-        ExportComponents();
+        await ExportComponentsAsync(cancellationToken).ConfigureAwait(false);
         
         var documentFilename = $"{_outputDir}{Path.DirectorySeparatorChar}OpenApi.{_format.GetFormatFileExtension()}";
-        var documentContent = _document
-            .SerializeDocumentAsync(_version, _format)
-            .GetAwaiter()
-            .GetResult()
+        var documentContent = (await _document
+                .SerializeDocumentAsync(_version, _format, cancellationToken)
+                .ConfigureAwait(false))
             .PreserveDeclaredSpecVersion(_declaredVersion, _format);
         foreach (var replacement in _pathReferenceReplacements)
         {
@@ -104,123 +104,123 @@ internal class OpenApiDocSplitter
                 replacement.Value,
                 StringComparison.Ordinal);
         }
-        File.WriteAllText(documentFilename, documentContent);
+        await File.WriteAllTextAsync(documentFilename, documentContent, cancellationToken).ConfigureAwait(false);
         SpecLogger.Log($"Main document created at : {documentFilename}");
     }
     
-    private void ExportComponents()
+    private async Task ExportComponentsAsync(CancellationToken cancellationToken)
     {
-        ExportSchemas();
-        ExportCallbacks();
-        ExportParameters();
-        ExportHeaders();
-        ExportLinks();
-        ExportResponses();
-        ExportRequestBodies();
-        ExportExamples();
+        await ExportSchemasAsync(cancellationToken).ConfigureAwait(false);
+        await ExportCallbacksAsync(cancellationToken).ConfigureAwait(false);
+        await ExportParametersAsync(cancellationToken).ConfigureAwait(false);
+        await ExportHeadersAsync(cancellationToken).ConfigureAwait(false);
+        await ExportLinksAsync(cancellationToken).ConfigureAwait(false);
+        await ExportResponsesAsync(cancellationToken).ConfigureAwait(false);
+        await ExportRequestBodiesAsync(cancellationToken).ConfigureAwait(false);
+        await ExportExamplesAsync(cancellationToken).ConfigureAwait(false);
         //ExportSecuritySchemes();
     }
 
-    private void ExportSchemas()
+    private Task ExportSchemasAsync(CancellationToken cancellationToken)
     {
         if (_document.Components?.Schemas?.Any() != true)
         {
             SpecLogger.Log("No Schema found!");
-            return;
+            return Task.CompletedTask;
         }
         
-        Export(_document.Components.Schemas);
+        return ExportAsync(_document.Components.Schemas, cancellationToken);
     }
 
-    private void ExportParameters()
+    private Task ExportParametersAsync(CancellationToken cancellationToken)
     {
         if (_document.Components?.Parameters?.Any() != true)
         {
             SpecLogger.Log("No Parameters found!");
-            return;
+            return Task.CompletedTask;
         }
         
-        Export(_document.Components.Parameters);
+        return ExportAsync(_document.Components.Parameters, cancellationToken);
     }
 
-    private void ExportExamples()
+    private Task ExportExamplesAsync(CancellationToken cancellationToken)
     {
         if (_document.Components?.Examples?.Any() != true)
         {
             SpecLogger.Log("No Examples found!");
-            return;
+            return Task.CompletedTask;
         }
         
-        Export(_document.Components.Examples);
+        return ExportAsync(_document.Components.Examples, cancellationToken);
     }
 
-    private void ExportSecuritySchemes()
+    private Task ExportSecuritySchemesAsync(CancellationToken cancellationToken)
     {
         if (_document.Components?.SecuritySchemes?.Any() != true)
         {
             SpecLogger.Log("No SecuritySchemes found!");
-            return;
+            return Task.CompletedTask;
         }
         
-        Export(_document.Components.SecuritySchemes);
+        return ExportAsync(_document.Components.SecuritySchemes, cancellationToken);
     }
 
-    private void ExportHeaders()
+    private Task ExportHeadersAsync(CancellationToken cancellationToken)
     {
         if (_document.Components?.Headers?.Any() != true)
         {
             SpecLogger.Log("No Headers found!");
-            return;
+            return Task.CompletedTask;
         }
         
-        Export(_document.Components.Headers);
+        return ExportAsync(_document.Components.Headers, cancellationToken);
     }
 
-    private void ExportResponses()
+    private Task ExportResponsesAsync(CancellationToken cancellationToken)
     {
         if (_document.Components?.Responses?.Any() != true)
         {
             SpecLogger.Log("No Response found!");
-            return;
+            return Task.CompletedTask;
         }
         
-        Export(_document.Components.Responses);
+        return ExportAsync(_document.Components.Responses, cancellationToken);
     }
 
-    private void ExportLinks()
+    private Task ExportLinksAsync(CancellationToken cancellationToken)
     {
         if (_document.Components?.Links?.Any() != true)
         {
             SpecLogger.Log("No Links found!");
-            return;
+            return Task.CompletedTask;
         }
         
-        Export(_document.Components.Links);
+        return ExportAsync(_document.Components.Links, cancellationToken);
     }
 
-    private void ExportCallbacks()
+    private Task ExportCallbacksAsync(CancellationToken cancellationToken)
     {
         if (_document.Components?.Callbacks?.Any() != true)
         {
             SpecLogger.Log("No Callbacks found!");
-            return;
+            return Task.CompletedTask;
         }
         
-        Export(_document.Components.Callbacks);
+        return ExportAsync(_document.Components.Callbacks, cancellationToken);
     }
 
-    private void ExportRequestBodies()
+    private Task ExportRequestBodiesAsync(CancellationToken cancellationToken)
     {
         if (_document.Components?.RequestBodies?.Any() != true)
         {
             SpecLogger.Log("No RequestBody found!");
-            return;
+            return Task.CompletedTask;
         }
         
-        Export(_document.Components.RequestBodies);
+        return ExportAsync(_document.Components.RequestBodies, cancellationToken);
     }
     
-    private void Export<T>(IDictionary<string, T> elements) where T : IOpenApiReferenceable
+    private async Task ExportAsync<T>(IDictionary<string, T> elements, CancellationToken cancellationToken) where T : IOpenApiReferenceable
     {
         string elementTypeName = typeof(T).GetOpenApiElementTypeName();
         string dir = Path.Combine(_outputDir, typeof(T).GetOpenApiElementDirectoryName());
@@ -245,11 +245,12 @@ internal class OpenApiDocSplitter
                         $"Unable to add {elementTypeName} component '{el.Key}'.");
                 }
 
-                temp_document.SaveDocumentToFile(
+                await temp_document.SaveDocumentToFileAsync(
                     _version,
                     _format,
                     filename,
-                    _declaredVersion);
+                    _declaredVersion,
+                    cancellationToken).ConfigureAwait(false);
                 exportedElements.Add((el.Key, filename));
             }
             catch (Exception ex)

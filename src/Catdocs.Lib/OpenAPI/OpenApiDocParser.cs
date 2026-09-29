@@ -58,7 +58,7 @@ public class OpenApiDocParser
 
     public long ParseTime => _parseTime;
     
-    public OpenApiSpecInfo Load()
+    public async Task<OpenApiSpecInfo> LoadAsync(CancellationToken cancellationToken = default)
     {
         if (!File.Exists(_inputFile))
         {
@@ -69,17 +69,17 @@ public class OpenApiDocParser
         var stop_watch = new Stopwatch();
         stop_watch.Start();
 
-        using var file_stream = new FileStream(_inputFile, FileMode.Open, FileAccess.Read);
+        using var file_stream = new FileStream(
+            _inputFile, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 4096, useAsync: true);
         _declaredVersion = OpenApiExtensions.GetDeclaredSpecVersion(
-            File.ReadAllText(_inputFile),
+            await File.ReadAllTextAsync(_inputFile, cancellationToken).ConfigureAwait(false),
             _format);
-        var readResult = OpenApiDocument.LoadAsync(
+        var readResult = await OpenApiDocument.LoadAsync(
                 file_stream,
                 _format.ToStr(),
                 OpenApiExtensions.CreateReaderSettings(_inputFile),
-                CancellationToken.None)
-            .GetAwaiter()
-            .GetResult();
+                cancellationToken)
+            .ConfigureAwait(false);
         _document = readResult.Document
             ?? throw new InvalidDataException($"Unable to parse OpenAPI document '{_inputFile}'.");
         var diagnostics = readResult.Diagnostic
@@ -124,36 +124,29 @@ public class OpenApiDocParser
     }
 
 
-    public string ToJsonString() => Convert(OpenApiFormat.Json);
+    public Task<string> ToJsonStringAsync(CancellationToken cancellationToken = default)
+        => ConvertAsync(OpenApiFormat.Json, cancellationToken);
 
-    public string ToYamlString() => Convert(OpenApiFormat.Yaml);
+    public Task<string> ToYamlStringAsync(CancellationToken cancellationToken = default)
+        => ConvertAsync(OpenApiFormat.Yaml, cancellationToken);
 
 
-    public void ConvertTo(OpenApiFormat format, string targetFilename)
+    public async Task ConvertToAsync(OpenApiFormat format, string targetFilename, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNullOrWhiteSpace(targetFilename);
 
         var stop_watch = new Stopwatch();
         stop_watch.Start();
         
-        string output = string.Empty;
+        var output = await ConvertAsync(format, cancellationToken).ConfigureAwait(false);
 
-        if (format is OpenApiFormat.Json)
-        {
-            output = ToJsonString();
-        }
-        else if (format is OpenApiFormat.Yaml)
-        {
-            output = ToYamlString();
-        }
-
-        SaveToFile(filePath: targetFilename, content: output);
+        await SaveToFileAsync(filePath: targetFilename, content: output, cancellationToken).ConfigureAwait(false);
         
         stop_watch.Stop();
         _convertTime = stop_watch.ElapsedMilliseconds;
     }
 
-    private string Convert(OpenApiFormat format)
+    private async Task<string> ConvertAsync(OpenApiFormat format, CancellationToken cancellationToken = default)
     {
         if(_document is null)
         {
@@ -161,7 +154,7 @@ public class OpenApiDocParser
         }
 
         using var stream = new MemoryStream();
-        _document.SerializeAsync(
+        await _document.SerializeAsync(
                 stream,
                 _version,
                 format.ToStr(),
@@ -170,18 +163,16 @@ public class OpenApiDocParser
                     InlineLocalReferences = _inlineLocal,
                     InlineExternalReferences = _inlineExternal
                 },
-                CancellationToken.None)
-            .GetAwaiter()
-            .GetResult();
+                cancellationToken)
+            .ConfigureAwait(false);
 
         stream.Position = 0;
 
-        return new StreamReader(stream)
-            .ReadToEnd()
-            .PreserveDeclaredSpecVersion(_declaredVersion, format);
+        var content = await new StreamReader(stream).ReadToEndAsync(cancellationToken).ConfigureAwait(false);
+        return content.PreserveDeclaredSpecVersion(_declaredVersion, format);
     }
 
-    public void Split(string outputDir)
+    public async Task SplitAsync(string outputDir, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(outputDir))
         {
@@ -197,7 +188,7 @@ public class OpenApiDocParser
             _version,
             _format,
             _declaredVersion);
-        splitter.Split();
+        await splitter.SplitAsync(cancellationToken).ConfigureAwait(false);
         
         //TODO: check if has components
         stop_watch.Stop();
@@ -206,7 +197,7 @@ public class OpenApiDocParser
     }
 
 
-    public void Bundle(string newDocumentFilename)
+    public async Task BundleAsync(string newDocumentFilename, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(newDocumentFilename))
         {
@@ -219,13 +210,14 @@ public class OpenApiDocParser
         var inputDir = GetDirectoryForFilename(_inputFile);
 
         var builder = new OpenApiDocBuilder(inputDir, _document, _version, _format);
-        var new_document = builder.Bundle();
+        var new_document = await builder.BundleAsync(cancellationToken).ConfigureAwait(false);
         
-        new_document.SaveDocumentToFile(
+        await new_document.SaveDocumentToFileAsync(
             _version,
             _format,
             newDocumentFilename,
-            _declaredVersion);
+            _declaredVersion,
+            cancellationToken).ConfigureAwait(false);
         
         stop_watch.Stop();
         _bundleTime = stop_watch.ElapsedMilliseconds;
@@ -277,13 +269,12 @@ public class OpenApiDocParser
         throw new FileNotFoundException(err); 
     }
     
-    private static void SaveToFile(string filePath, string content)
+    private static async Task SaveToFileAsync(string filePath, string content, CancellationToken cancellationToken = default)
     {
-        var fs = new FileStream(
-            filePath, FileMode.Create, FileAccess.Write, FileShare.Read);
-        using var stream_writer = new StreamWriter(fs);
-        stream_writer.Write(content);
-        stream_writer.Flush();
-        stream_writer.Close();
+        await using var fs = new FileStream(
+            filePath, FileMode.Create, FileAccess.Write, FileShare.Read, bufferSize: 4096, useAsync: true);
+        await using var stream_writer = new StreamWriter(fs);
+        await stream_writer.WriteAsync(content.AsMemory(), cancellationToken).ConfigureAwait(false);
+        await stream_writer.FlushAsync(cancellationToken).ConfigureAwait(false);
     }
 }
